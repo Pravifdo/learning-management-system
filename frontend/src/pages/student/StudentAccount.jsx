@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import '../styles/StudentAccount.css';
+import '../../styles/StudentAccount.css';
 
 function StudentAccount() {
   const { user, logout } = useAuth();
@@ -116,6 +116,17 @@ function StudentAccount() {
             </div>
             <p className="progress-text">{studentData?.attendance || 0}% Completed</p>
           </div>
+        </div>
+
+        {/* My Courses Box */}
+        <div 
+          className="info-card my-courses-box"
+          onClick={() => navigate('/student/courses')}
+          style={{ cursor: 'pointer' }}
+        >
+          <h2>📚 My Courses</h2>
+          <p>View all your enrolled courses and course materials</p>
+          <button className="view-courses-btn">View Courses →</button>
         </div>
 
         {/* Enrolled Courses */}

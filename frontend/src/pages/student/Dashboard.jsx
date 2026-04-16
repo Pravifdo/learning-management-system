@@ -1,6 +1,6 @@
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Dashboard.css';
+import '../../styles/Dashboard.css';
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -32,7 +32,7 @@ function Dashboard() {
         <div className="dashboard-grid">
           {user?.role === 'student' && (
             <>
-              <div className="dashboard-card">
+              <div className="dashboard-card clickable" onClick={() => navigate('/student/courses')}>
                 <h3>📚 My Courses</h3>
                 <p>View and manage your enrolled courses</p>
               </div>

@@ -3,12 +3,15 @@ import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import Dashboard from './pages/Dashboard';
-import LecturerDashboard from './pages/LecturerDashboard';
-import LecturerStudentDetail from './pages/LecturerStudentDetail';
-import StudentDetail from './pages/StudentDetail';
-import StudentAccount from './pages/StudentAccount';
-import LecturerUpload from './pages/LecturerUpload';
+import Dashboard from './pages/student/Dashboard';
+import LecturerDashboard from './pages/lecturer/LecturerDashboard';
+import LecturerStudentDetail from './pages/lecturer/LecturerStudentDetail';
+import StudentDetail from './pages/student/StudentDetail';
+import StudentAccount from './pages/student/StudentAccount';
+import LecturerUpload from './pages/lecturer/LecturerUpload';
+import LecturerUploads from './pages/lecturer/LecturerUploads';
+import CourseUploads from './pages/student/CourseUploads';
+import MyCourses from './pages/student/myCouses';
 import './App.css';
 
 // Protected Route Component
@@ -90,8 +93,20 @@ function AppRoutes() {
         element={<RoleRoute element={<StudentAccount />} allowedRole="student" />}
       />
       <Route
+        path="/student/courses"
+        element={<RoleRoute element={<MyCourses />} allowedRole="student" />}
+      />
+      <Route
+        path="/student/courses/:subject/uploads"
+        element={<RoleRoute element={<CourseUploads />} allowedRole="student" />}
+      />
+      <Route
         path="/lecturer/upload"
         element={<RoleRoute element={<LecturerUpload />} allowedRole="lecturer" />}
+      />
+      <Route
+        path="/lecturer/uploads"
+        element={<RoleRoute element={<LecturerUploads />} allowedRole="lecturer" />}
       />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

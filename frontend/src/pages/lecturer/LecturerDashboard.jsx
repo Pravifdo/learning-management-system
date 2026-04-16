@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import '../styles/LecturerDashboard.css';
+import '../../styles/LecturerDashboard.css';
 
 function LecturerDashboard() {
   const { user, logout } = useAuth();
@@ -170,12 +170,15 @@ function LecturerDashboard() {
                   className="action-card"
                   onClick={() => navigate('/lecturer/upload')}
                 >
-                  <h3>📤 Bulk Upload</h3>
-                  <p>Upload marks & attendance via CSV</p>
+                  <h3>📤 Upload Content</h3>
+                  <p>Upload lecture notes & assignments</p>
                 </div>
-                <div className="action-card">
-                  <h3>📊 Class Stats</h3>
-                  <p>View class statistics</p>
+                <div 
+                  className="action-card"
+                  onClick={() => navigate('/lecturer/uploads')}
+                >
+                  <h3>📚 My Uploads</h3>
+                  <p>View & manage your uploaded content</p>
                 </div>
               </div>
             </div>

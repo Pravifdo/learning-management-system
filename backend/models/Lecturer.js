@@ -27,6 +27,26 @@ const lecturerSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    courses: [
+      {
+        courseCode: {
+          type: String,
+          trim: true,
+        },
+        courseName: {
+          type: String,
+          trim: true,
+        },
+        description: {
+          type: String,
+          default: "",
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     createdAt: {
       type: Date,
       default: Date.now,

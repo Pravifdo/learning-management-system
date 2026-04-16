@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import '../styles/LecturerStudents.css';
+import { useAuth } from '../../hooks/useAuth';
+import '../../styles/LecturerStudents.css';
 
 function LecturerStudents() {
   const { logout } = useAuth();

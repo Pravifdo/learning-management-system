@@ -158,6 +158,47 @@
   background-color: #7f8c8d;
 }
 
+/* My Courses Box */
+.my-courses-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.my-courses-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.my-courses-box h2 {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.my-courses-box p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.view-courses-btn {
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.view-courses-btn:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
+}
+
 @media (max-width: 768px) {
   .account-content {
     padding: 1rem;
