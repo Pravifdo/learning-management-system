@@ -44,9 +44,9 @@ function Dashboard() {
                 <h3>📊 My Account</h3>
                 <p>View your grades, marks and attendance</p>
               </div>
-              <div className="dashboard-card">
-                <h3>✏️ Attendance</h3>
-                <p>Check your attendance records</p>
+              <div className="dashboard-card clickable" onClick={() => navigate('/exams')}>
+                <h3>✏️ Exam</h3>
+                <p>Check your exam schedules and results</p>
               </div>
             </>
           )}

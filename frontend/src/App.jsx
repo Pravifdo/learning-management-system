@@ -12,6 +12,7 @@ import LecturerUpload from './pages/lecturer/LecturerUpload';
 import LecturerUploads from './pages/lecturer/LecturerUploads';
 import CourseUploads from './pages/student/CourseUploads';
 import MyCourses from './pages/student/myCouses';
+import ExamAdmin from './pages/admin/ExamAdmin.jsx';
 import './App.css';
 
 // Protected Route Component
@@ -107,6 +108,14 @@ function AppRoutes() {
       <Route
         path="/lecturer/uploads"
         element={<RoleRoute element={<LecturerUploads />} allowedRole="lecturer" />}
+      />
+      <Route
+        path="/admin/exams"
+        element={<RoleRoute element={<ExamAdmin />} allowedRole="admin" />}
+      />
+      <Route
+        path="/exams"
+        element={<ProtectedRoute element={<ExamAdmin />} />}
       />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
