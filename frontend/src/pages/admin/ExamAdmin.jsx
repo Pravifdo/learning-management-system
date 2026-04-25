@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { getAllExams, createExam, updateExam, deleteExam } from '../../services/examService';
-import { uploadExamResults, getExamResults } from '../../services/resultsService';
 import '../../styles/ExamAdmin.css';
 
 function ExamAdmin() {
@@ -189,6 +187,12 @@ function ExamAdmin() {
       <nav className="navbar">
         <div className="navbar-left">
           <h1>{isAdmin ? '📋 Exam Administration Panel' : '📋 View Exams'}</h1>
+          {isAdmin && (
+            <div className="nav-links">
+              <button className="nav-btn active">📋 Manage Exams</button>
+              <button onClick={() => navigate('/admin/users')} className="nav-btn">👥 Manage Users</button>
+            </div>
+          )}
         </div>
         <div className="navbar-right">
           <span className="user-name">{user?.fullName}</span>
