@@ -1,0 +1,232 @@
+.system-reports-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.system-reports-container .navbar {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.system-reports-container .navbar-left h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.system-reports-container .nav-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.system-reports-container .nav-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.system-reports-container .nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.system-reports-container .nav-btn.active {
+  background-color: #667eea;
+  border-color: #667eea;
+}
+
+.system-reports-container .navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.system-reports-container .user-name {
+  color: #fff;
+  font-weight: 600;
+}
+
+.system-reports-container .logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.system-reports-container .logout-btn:hover {
+  background-color: #c82333;
+}
+
+.system-reports-container .admin-content {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.system-reports-container .header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.system-reports-container h2 {
+  color: white;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.system-reports-container h3 {
+  color: white;
+  margin-top: 0;
+}
+
+.system-reports-container .report-filters {
+  display: flex;
+  gap: 1rem;
+}
+
+.system-reports-container .filter-select {
+  padding: 0.8rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.system-reports-container .filter-select option {
+  background-color: #333;
+  color: white;
+}
+
+.system-reports-container .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.system-reports-container .stat-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.system-reports-container .stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.system-reports-container .stat-icon {
+  font-size: 2.5rem;
+}
+
+.system-reports-container .stat-content h3 {
+  color: #333;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.system-reports-container .stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #667eea;
+  margin: 0.5rem 0 0 0;
+}
+
+.system-reports-container .reports-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.system-reports-container .reports-section h3 {
+  color: #333;
+  margin-top: 0;
+}
+
+.system-reports-container .activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.system-reports-container .activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border-left: 4px solid #667eea;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.system-reports-container .activity-time {
+  font-weight: 600;
+  color: #667eea;
+  min-width: 100px;
+  font-size: 0.9rem;
+}
+
+.system-reports-container .activity-text {
+  color: #333;
+  flex: 1;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .system-reports-container .nav-links {
+    flex-direction: column;
+  }
+
+  .system-reports-container .navbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .system-reports-container .header-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .system-reports-container .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

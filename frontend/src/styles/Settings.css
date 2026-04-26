@@ -1,0 +1,271 @@
+.settings-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.settings-container .navbar {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.settings-container .navbar-left h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.settings-container .nav-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.settings-container .nav-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.settings-container .nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.settings-container .nav-btn.active {
+  background-color: #667eea;
+  border-color: #667eea;
+}
+
+.settings-container .navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.settings-container .user-name {
+  color: #fff;
+  font-weight: 600;
+}
+
+.settings-container .logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.settings-container .logout-btn:hover {
+  background-color: #c82333;
+}
+
+.settings-container .admin-content {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.settings-container .header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.settings-container h2 {
+  color: white;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.settings-container .success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.settings-container .settings-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
+}
+
+.settings-container .settings-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.settings-container .settings-section:last-child {
+  border-bottom: none;
+}
+
+.settings-container .settings-section h3 {
+  color: #333;
+  margin-top: 0;
+}
+
+.settings-container .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.settings-container .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.settings-container .form-group label {
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.settings-container .form-group input,
+.settings-container .form-group select {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.settings-container .form-group input:focus,
+.settings-container .form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+
+.settings-container .form-group.checkbox {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.settings-container .form-group.checkbox input {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.settings-container .form-group.checkbox label {
+  margin-bottom: 0;
+  font-weight: normal;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.settings-container .form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.settings-container .btn-submit {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.settings-container .btn-submit:hover {
+  background-color: #5568d3;
+}
+
+.settings-container .danger-zone {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-left: 4px solid #dc3545;
+}
+
+.settings-container .danger-zone h3 {
+  color: #dc3545;
+}
+
+.settings-container .danger-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.settings-container .btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.settings-container .btn-danger:hover {
+  background-color: #c82333;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .settings-container .nav-links {
+    flex-direction: column;
+  }
+
+  .settings-container .navbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .settings-container .header-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .settings-container .danger-actions {
+    flex-direction: column;
+  }
+
+  .settings-container .danger-actions button {
+    width: 100%;
+  }
+}

@@ -1,6 +1,6 @@
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from './hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/Dashboard.css';
+import './styles/Dashboard.css';
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -74,19 +74,19 @@ function Dashboard() {
 
           {user?.role === 'admin' && (
             <>
-              <div className="dashboard-card">
+              <div className="dashboard-card clickable" onClick={() => navigate('/admin/users')}>
                 <h3>👥 Manage Users</h3>
                 <p>Add, edit or remove users</p>
               </div>
-              <div className="dashboard-card">
+              <div className="dashboard-card clickable" onClick={() => navigate('/admin/courses')}>
                 <h3>📚 Manage Courses</h3>
                 <p>Add, edit or remove courses</p>
               </div>
-              <div className="dashboard-card">
+              <div className="dashboard-card clickable" onClick={() => navigate('/admin/reports')}>
                 <h3>📊 System Reports</h3>
                 <p>View system statistics and reports</p>
               </div>
-              <div className="dashboard-card">
+              <div className="dashboard-card clickable" onClick={() => navigate('/admin/settings')}>
                 <h3>⚙️ Settings</h3>
                 <p>Configure system settings</p>
               </div>
