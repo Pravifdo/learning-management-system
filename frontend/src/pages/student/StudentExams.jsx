@@ -79,7 +79,7 @@ function StudentExams() {
     <div className="student-exams-container">
       <nav className="navbar">
         <div className="navbar-left">
-          <h1>📋 Exam Timetable</h1>
+          <h1>� Exam Topics Timetable</h1>
         </div>
         <div className="navbar-right">
           <span className="user-name">{user?.fullName}</span>
@@ -88,7 +88,7 @@ function StudentExams() {
 
       <div className="exams-content">
         <div className="exams-header">
-          <h2>Your Exam Schedule</h2>
+          <h2>📚 Your Exam Topics & Schedule</h2>
           <div className="filter-controls">
             <label>Filter by Status: </label>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
@@ -118,6 +118,9 @@ function StudentExams() {
                   <th>Subject</th>
                   <th>Exam Code</th>
                   <th>Title</th>
+                  <th>Topic</th>
+                  <th>Year</th>
+                  <th>Semester</th>
                   <th>Start Time</th>
                   <th>End Time</th>
                   <th>Duration</th>
@@ -132,6 +135,9 @@ function StudentExams() {
                     <td className="subject-cell">{exam.subject}</td>
                     <td className="code-cell"><span className="code-badge">{exam.code}</span></td>
                     <td className="title-cell">{exam.title}</td>
+                    <td className="topic-cell">{exam.topic || 'N/A'}</td>
+                    <td className="year-cell">{exam.year || 'N/A'}</td>
+                    <td className="semester-cell">{exam.semester || 'N/A'}</td>
                     <td className="time-cell">{formatTime(exam.startTime)}</td>
                     <td className="time-cell">{formatTime(exam.endTime)}</td>
                     <td className="duration-cell">{exam.duration} mins</td>
@@ -189,6 +195,18 @@ function StudentExams() {
                 <div className="detail-row">
                   <label>Total Marks:</label>
                   <span>{selectedExam.totalMarks}</span>
+                </div>
+                <div className="detail-row">
+                  <label>Topic:</label>
+                  <span>{selectedExam.topic || 'N/A'}</span>
+                </div>
+                <div className="detail-row">
+                  <label>Year:</label>
+                  <span>{selectedExam.year || 'N/A'}</span>
+                </div>
+                <div className="detail-row">
+                  <label>Semester:</label>
+                  <span>{selectedExam.semester || 'N/A'}</span>
                 </div>
                 <div className="detail-row">
                   <label>Status:</label>

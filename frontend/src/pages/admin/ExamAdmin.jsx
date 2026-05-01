@@ -11,6 +11,9 @@ function ExamAdmin() {
   const [selectedExam, setSelectedExam] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterTopic, setFilterTopic] = useState('');
+  const [filterYear, setFilterYear] = useState('');
+  const [filterSemester, setFilterSemester] = useState('all');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [editingRowId, setEditingRowId] = useState(null);
@@ -26,7 +29,7 @@ function ExamAdmin() {
 
   useEffect(() => {
     filterExams();
-  }, [exams, searchTerm, filterStatus]);
+  }, [exams, searchTerm, filterStatus, filterTopic, filterYear, filterSemester]);
 
   const fetchExams = async () => {
     try {
@@ -68,6 +71,20 @@ function ExamAdmin() {
       filtered = filtered.filter((exam) => exam.status === filterStatus);
     }
 
+    if (filterTopic) {
+      filtered = filtered.filter((exam) =>
+        exam.topic?.toLowerCase().includes(filterTopic.toLowerCase())
+      );
+    }
+
+    if (filterYear) {
+      filtered = filtered.filter((exam) => exam.year === parseInt(filterYear));
+    }
+
+    if (filterSemester !== 'all') {
+      filtered = filtered.filter((exam) => exam.semester === filterSemester);
+    }
+
     setFilteredExams(filtered);
   };
 
@@ -86,6 +103,9 @@ function ExamAdmin() {
         totalMarks: '',
         duration: '',
         description: '',
+        topic: '',
+        year: new Date().getFullYear(),
+        semester: '1',
         status: 'Scheduled',
       },
     ]);
@@ -114,13 +134,13 @@ function ExamAdmin() {
     const newRow = newRows.find((r) => r.id === rowId);
 
     if (
-      !newRow.title ||
       !newRow.subject ||
       !newRow.code ||
       !newRow.date ||
-      !newRow.totalMarks
+      !newRow.startTime ||
+      !newRow.endTime
     ) {
-      showNotification('Please fill in all required fields', 'error');
+      showNotification('Please fill in all required fields (Date, Subject, Code, Start Time, End Time)', 'error');
       return;
     }
 
@@ -132,21 +152,24 @@ function ExamAdmin() {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title: newRow.title,
+          title: newRow.code,
           subject: newRow.subject,
           code: newRow.code,
           date: newRow.date,
           startTime: newRow.startTime,
           endTime: newRow.endTime,
-          totalMarks: newRow.totalMarks,
-          duration: newRow.duration,
+          totalMarks: 100,
+          duration: 60,
           description: newRow.description,
+          topic: 'General',
+          year: new Date().getFullYear(),
+          semester: '1',
           status: newRow.status,
         }),
       });
 
       if (response.ok) {
-        showNotification('Exam created successfully', 'success');
+        showNotification('✅ Exam published! Students and Lecturers can now view this exam.', 'success');
         setNewRows(newRows.filter((r) => r.id !== rowId));
         setEditingRowId(null);
         fetchExams();
@@ -176,8 +199,8 @@ function ExamAdmin() {
   const saveEdit = async (examId) => {
     const data = editingData[examId];
 
-    if (!data.title || !data.subject || !data.code || !data.date || !data.totalMarks) {
-      showNotification('Please fill in all required fields', 'error');
+    if (!data.subject || !data.code || !data.date || !data.startTime || !data.endTime) {
+      showNotification('Please fill in all required fields (Date, Subject, Code, Start Time, End Time)', 'error');
       return;
     }
 
@@ -189,21 +212,24 @@ function ExamAdmin() {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title: data.title,
+          title: data.title || data.code,
           subject: data.subject,
           code: data.code,
           date: data.date,
           startTime: data.startTime,
           endTime: data.endTime,
-          totalMarks: data.totalMarks,
-          duration: data.duration,
+          totalMarks: data.totalMarks || 100,
+          duration: data.duration || 60,
           description: data.description,
+          topic: data.topic || 'General',
+          year: data.year || new Date().getFullYear(),
+          semester: data.semester || '1',
           status: data.status,
         }),
       });
 
       if (response.ok) {
-        showNotification('Exam updated successfully', 'success');
+        showNotification('✅ Exam updated! Students and Lecturers can now see the changes.', 'success');
         setEditingRowId(null);
         setEditingData({});
         fetchExams();
@@ -284,9 +310,6 @@ function ExamAdmin() {
           <p className="faculty-info">Faculty of Applied Science | Department of Computer Science</p>
           <h1 className="exam-title">📋 Examination Time Table</h1>
         </div>
-        <button className="btn btn-primary" onClick={addNewRow}>
-          + Add New Row
-        </button>
       </div>
 
       {message && (
@@ -319,10 +342,48 @@ function ExamAdmin() {
             <option value="Cancelled">Cancelled</option>
           </select>
         </div>
+        <div className="filter-topic">
+          <label htmlFor="topicFilter">Topic:</label>
+          <input
+            id="topicFilter"
+            type="text"
+            placeholder="Search topic..."
+            value={filterTopic}
+            onChange={(e) => setFilterTopic(e.target.value)}
+            className="filter-input"
+          />
+        </div>
+        <div className="filter-year">
+          <label htmlFor="yearFilter">Year:</label>
+          <input
+            id="yearFilter"
+            type="number"
+            placeholder="Enter year..."
+            value={filterYear}
+            onChange={(e) => setFilterYear(e.target.value)}
+            className="filter-input"
+          />
+        </div>
+        <div className="filter-semester">
+          <label htmlFor="semesterFilter">Semester:</label>
+          <select
+            id="semesterFilter"
+            value={filterSemester}
+            onChange={(e) => setFilterSemester(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="Special">Special</option>
+          </select>
+        </div>
       </div>
 
       <div className="exam-list-section">
-        <h2>Exam Timetable ({filteredExams.length + newRows.length})</h2>
+        <div className="exam-list-header">
+          <h2>📚 Exam Topics Timetable</h2>
+         
+        </div>
         {loading ? (
           <div className="loading">Loading exams...</div>
         ) : filteredExams.length === 0 && newRows.length === 0 ? (
@@ -335,10 +396,8 @@ function ExamAdmin() {
                   <th>Date</th>
                   <th>Subject</th>
                   <th>Code</th>
-                  <th>Title</th>
                   <th>Start Time</th>
                   <th>End Time</th>
-                  <th>Duration (min)</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -377,16 +436,6 @@ function ExamAdmin() {
                     </td>
                     <td>
                       <input
-                        type="text"
-                        value={row.title}
-                        onChange={(e) => handleNewRowChange(row.id, 'title', e.target.value)}
-                        className="cell-input"
-                        placeholder="Title"
-                        required
-                      />
-                    </td>
-                    <td>
-                      <input
                         type="time"
                         value={row.startTime}
                         onChange={(e) => handleNewRowChange(row.id, 'startTime', e.target.value)}
@@ -399,15 +448,6 @@ function ExamAdmin() {
                         value={row.endTime}
                         onChange={(e) => handleNewRowChange(row.id, 'endTime', e.target.value)}
                         className="cell-input"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        value={row.duration}
-                        onChange={(e) => handleNewRowChange(row.id, 'duration', e.target.value)}
-                        className="cell-input"
-                        placeholder="mins"
                       />
                     </td>
                     <td className="action-buttons">
@@ -466,18 +506,6 @@ function ExamAdmin() {
                         <span className="code-badge">{exam.code}</span>
                       )}
                     </td>
-                    <td className="title-cell">
-                      {editingRowId === exam._id ? (
-                        <input
-                          type="text"
-                          value={editingData[exam._id]?.title}
-                          onChange={(e) => handleEditChange(exam._id, 'title', e.target.value)}
-                          className="cell-input"
-                        />
-                      ) : (
-                        exam.title
-                      )}
-                    </td>
                     <td className="time-cell">
                       {editingRowId === exam._id ? (
                         <input
@@ -500,18 +528,6 @@ function ExamAdmin() {
                         />
                       ) : (
                         exam.endTime || 'N/A'
-                      )}
-                    </td>
-                    <td className="duration-cell">
-                      {editingRowId === exam._id ? (
-                        <input
-                          type="number"
-                          value={editingData[exam._id]?.duration}
-                          onChange={(e) => handleEditChange(exam._id, 'duration', e.target.value)}
-                          className="cell-input"
-                        />
-                      ) : (
-                        exam.duration
                       )}
                     </td>
                     <td className="action-buttons">
@@ -557,8 +573,27 @@ function ExamAdmin() {
                 ))}
               </tbody>
             </table>
+             <button className="btn btn-primary" onClick={addNewRow}>
+            + Add New Row
+          </button>
           </div>
         )}
+      </div>
+
+      {/* Submit Button Section */}
+      <div className="submit-section">
+        <button 
+          className="btn btn-lg btn-submit" 
+          onClick={() => {
+            if (filteredExams.length === 0 && newRows.length === 0) {
+              showNotification('No exams to publish. Add exams first.', 'error');
+            } else {
+              showNotification('✅ Timetable Published! All Students and Lecturers can now view the exam schedule.', 'success');
+            }
+          }}
+        >
+          📢 Publish Timetable for Students & Lecturers
+        </button>
       </div>
 
       {/* Details Modal */}
@@ -601,10 +636,7 @@ function ExamAdmin() {
                 <span className="detail-label">End Time:</span>
                 <span className="detail-value">{selectedExam.endTime || 'N/A'}</span>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">Duration:</span>
-                <span className="detail-value">{selectedExam.duration} minutes</span>
-              </div>
+             
               {selectedExam.description && (
                 <div className="detail-row">
                   <span className="detail-label">Description:</span>

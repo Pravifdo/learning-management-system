@@ -43,6 +43,19 @@ const examSchema = new mongoose.Schema(
       enum: ['Scheduled', 'Ongoing', 'Completed', 'Cancelled'],
       default: 'Scheduled',
     },
+    topic: {
+      type: String,
+      required: true,
+    },
+    year: {
+      type: Number,
+      required: true,
+    },
+    semester: {
+      type: String,
+      enum: ['1', '2', 'Special'],
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -43,9 +43,9 @@ export const getExamById = async (req, res) => {
 // Create exam (admin only)
 export const createExam = async (req, res) => {
   try {
-    const { title, subject, code, date, startTime, endTime, totalMarks, duration, description, status } = req.body;
+    const { title, subject, code, date, startTime, endTime, totalMarks, duration, description, status, topic, year, semester } = req.body;
 
-    if (!title || !subject || !code || !date || !startTime || !endTime || !totalMarks || !duration) {
+    if (!title || !subject || !code || !date || !startTime || !endTime || !totalMarks || !duration || !topic || !year || !semester) {
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields',
@@ -62,6 +62,9 @@ export const createExam = async (req, res) => {
       totalMarks,
       duration,
       description,
+      topic,
+      year,
+      semester,
       status: status || 'Scheduled',
     });
 
@@ -84,7 +87,7 @@ export const createExam = async (req, res) => {
 export const updateExam = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, subject, code, date, startTime, endTime, totalMarks, duration, description, status } = req.body;
+    const { title, subject, code, date, startTime, endTime, totalMarks, duration, description, status, topic, year, semester } = req.body;
 
     const exam = await Exam.findByIdAndUpdate(
       id,
@@ -99,6 +102,9 @@ export const updateExam = async (req, res) => {
         duration,
         description,
         status,
+        topic,
+        year,
+        semester,
       },
       { new: true, runValidators: true }
     );
