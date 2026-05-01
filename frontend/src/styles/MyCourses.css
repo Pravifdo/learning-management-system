@@ -22,9 +22,9 @@
   background: #ffffff;
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: 0.3s;
-  border-left: 4px solid #3498db;
+  border-left: 4px solid #2563eb;
   display: flex;
   flex-direction: column;
 }
@@ -40,7 +40,7 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.8rem;
-  border-bottom: 2px solid #3498db;
+  border-bottom: 2px solid #2563eb;
 }
 
 .course-title {
@@ -61,7 +61,7 @@
 }
 
 .course-code {
-  background: #3498db;
+  background: #2563eb;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
@@ -99,7 +99,7 @@
   color: #555;
   font-size: 0.8rem;
   padding-left: 0.5rem;
-  border-left: 2px solid #3498db;
+  border-left: 2px solid #2563eb;
 }
 
 .course-description {

@@ -43,9 +43,9 @@ export const getExamById = async (req, res) => {
 // Create exam (admin only)
 export const createExam = async (req, res) => {
   try {
-    const { title, subject, date, startTime, endTime, totalMarks, duration, description, status } = req.body;
+    const { title, subject, code, date, startTime, endTime, totalMarks, duration, description, status } = req.body;
 
-    if (!title || !subject || !date || !startTime || !endTime || !totalMarks || !duration) {
+    if (!title || !subject || !code || !date || !startTime || !endTime || !totalMarks || !duration) {
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields',
@@ -55,6 +55,7 @@ export const createExam = async (req, res) => {
     const exam = new Exam({
       title,
       subject,
+      code,
       date,
       startTime,
       endTime,
@@ -83,13 +84,14 @@ export const createExam = async (req, res) => {
 export const updateExam = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, subject, date, startTime, endTime, totalMarks, duration, description, status } = req.body;
+    const { title, subject, code, date, startTime, endTime, totalMarks, duration, description, status } = req.body;
 
     const exam = await Exam.findByIdAndUpdate(
       id,
       {
         title,
         subject,
+        code,
         date,
         startTime,
         endTime,

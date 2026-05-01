@@ -59,7 +59,7 @@
 }
 
 .score-box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   padding: 2rem;
   border-radius: 8px;
@@ -123,7 +123,7 @@
 .course-item {
   background: #f9f9f9;
   padding: 1rem;
-  border-left: 4px solid #3498db;
+  border-left: 4px solid #2563eb;
   border-radius: 4px;
 }
 
@@ -160,7 +160,7 @@
 
 /* My Courses Box */
 .my-courses-box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -168,7 +168,7 @@
 
 .my-courses-box:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
 }
 
 .my-courses-box h2 {
@@ -184,7 +184,7 @@
 
 .view-courses-btn {
   background: white;
-  color: #667eea;
+  color: #2563eb;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 4px;

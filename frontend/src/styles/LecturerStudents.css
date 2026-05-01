@@ -61,7 +61,7 @@ tr:hover {
 }
 
 .view-btn {
-  background-color: #3498db;
+  background-color: #2563eb;
   color: white;
   padding: 0.5rem 1rem;
   border: none;
@@ -72,7 +72,7 @@ tr:hover {
 }
 
 .view-btn:hover {
-  background-color: #2980b9;
+  background-color: #1e40af;
 }
 
 .no-students {

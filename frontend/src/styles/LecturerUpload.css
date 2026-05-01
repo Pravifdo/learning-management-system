@@ -5,7 +5,7 @@
 .lecturer-upload-container {
   padding: 0;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f3f4f6;
 }
 
 .navbar {
@@ -13,9 +13,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 30px;
-  background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-bottom: 2px solid #2563eb;
 }
 
 .navbar h1 {
@@ -32,8 +32,8 @@
 
 .navbar button {
   padding: 10px 20px;
-  background: white;
-  color: #667eea;
+  background: #2563eb;
+  color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -43,9 +43,9 @@
 }
 
 .navbar button:hover {
-  background: #f0f0f0;
+  background: #1e40af;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .upload-content {
@@ -65,9 +65,9 @@
   flex: 1;
   min-width: 200px;
   padding: 14px 24px;
-  background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  background: #2563eb;
+  color: white;
+  border: 2px solid #2563eb;
   border-radius: 10px;
   font-weight: 600;
   font-size: 15px;
@@ -76,10 +76,10 @@
 }
 
 .add-buttons button:hover {
-  background: #667eea;
+  background: #1e40af;
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .activity-card {
@@ -88,13 +88,13 @@
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  border-left: 5px solid #667eea;
+  border-left: 5px solid #2563eb;
 }
 
 .activity-card:hover {
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.1);
   transform: translateY(-2px);
 }
 
@@ -144,8 +144,8 @@
 
 .activity-card input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .activity-card input::placeholder {
@@ -155,12 +155,12 @@
 .activity-card input[type="file"] {
   padding: 10px 8px;
   cursor: pointer;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border: 2px dashed #667eea;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 2px dashed #2563eb;
 }
 
 .activity-card input[type="file"]::-webkit-file-upload-button {
-  background: #667eea;
+  background: #2563eb;
   color: white;
   padding: 8px 16px;
   border: none;
@@ -228,7 +228,7 @@
 .upload-btn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 10px;

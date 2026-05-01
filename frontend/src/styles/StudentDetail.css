@@ -110,7 +110,7 @@
 }
 
 .edit-mode-btn {
-  background-color: #3498db;
+  background-color: #2563eb;
   color: white;
   padding: 0.75rem 1.5rem;
   border: none;
@@ -123,7 +123,7 @@
 }
 
 .edit-mode-btn:hover {
-  background-color: #2980b9;
+  background-color: #1e40af;
 }
 
 .edit-mode-btn.cancel {

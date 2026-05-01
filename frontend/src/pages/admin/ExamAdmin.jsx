@@ -7,29 +7,15 @@ function ExamAdmin() {
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [uploadingExamId, setUploadingExamId] = useState(null);
-  const [uploadFile, setUploadFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
-
-  const [formData, setFormData] = useState({
-    title: '',
-    subject: '',
-    date: '',
-    startTime: '',
-    endTime: '',
-    totalMarks: '',
-    duration: '',
-    description: '',
-    status: 'Scheduled',
-  });
+  const [editingRowId, setEditingRowId] = useState(null);
+  const [newRows, setNewRows] = useState([]);
+  const [editingData, setEditingData] = useState({});
 
   const API_BASE_URL = 'http://localhost:5000/api';
   const token = localStorage.getItem('token');
@@ -73,7 +59,8 @@ function ExamAdmin() {
       filtered = filtered.filter(
         (exam) =>
           exam.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          exam.subject?.toLowerCase().includes(searchTerm.toLowerCase())
+          exam.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          exam.code?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -84,42 +71,84 @@ function ExamAdmin() {
     setFilteredExams(filtered);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+  const addNewRow = () => {
+    const newRowId = `new-${Date.now()}`;
+    setNewRows([
+      ...newRows,
+      {
+        id: newRowId,
+        title: '',
+        subject: '',
+        code: '',
+        date: '',
+        startTime: '',
+        endTime: '',
+        totalMarks: '',
+        duration: '',
+        description: '',
+        status: 'Scheduled',
+      },
+    ]);
+    setEditingRowId(newRowId);
+  };
+
+  const handleNewRowChange = (rowId, field, value) => {
+    setNewRows(
+      newRows.map((row) =>
+        row.id === rowId ? { ...row, [field]: value } : row
+      )
+    );
+  };
+
+  const handleEditChange = (examId, field, value) => {
+    setEditingData({
+      ...editingData,
+      [examId]: {
+        ...(editingData[examId] || exams.find((e) => e._id === examId)),
+        [field]: value,
+      },
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const saveNewRow = async (rowId) => {
+    const newRow = newRows.find((r) => r.id === rowId);
 
-    if (!formData.title || !formData.subject || !formData.date || !formData.totalMarks) {
+    if (
+      !newRow.title ||
+      !newRow.subject ||
+      !newRow.code ||
+      !newRow.date ||
+      !newRow.totalMarks
+    ) {
       showNotification('Please fill in all required fields', 'error');
       return;
     }
 
     try {
-      const method = editingId ? 'PUT' : 'POST';
-      const url = editingId ? `${API_BASE_URL}/exams/${editingId}` : `${API_BASE_URL}/exams`;
-
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(`${API_BASE_URL}/exams`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          title: newRow.title,
+          subject: newRow.subject,
+          code: newRow.code,
+          date: newRow.date,
+          startTime: newRow.startTime,
+          endTime: newRow.endTime,
+          totalMarks: newRow.totalMarks,
+          duration: newRow.duration,
+          description: newRow.description,
+          status: newRow.status,
+        }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        showNotification(
-          editingId ? 'Exam updated successfully' : 'Exam created successfully',
-          'success'
-        );
-        resetForm();
+        showNotification('Exam created successfully', 'success');
+        setNewRows(newRows.filter((r) => r.id !== rowId));
+        setEditingRowId(null);
         fetchExams();
       } else {
         const errorData = await response.json();
@@ -131,20 +160,66 @@ function ExamAdmin() {
     }
   };
 
-  const handleEdit = (exam) => {
-    setEditingId(exam._id);
-    setFormData({
-      title: exam.title,
-      subject: exam.subject,
-      date: exam.date,
-      startTime: exam.startTime,
-      endTime: exam.endTime,
-      totalMarks: exam.totalMarks,
-      duration: exam.duration,
-      description: exam.description,
-      status: exam.status,
+  const cancelNewRow = (rowId) => {
+    setNewRows(newRows.filter((r) => r.id !== rowId));
+    setEditingRowId(null);
+  };
+
+  const startEdit = (examId) => {
+    const exam = exams.find((e) => e._id === examId);
+    setEditingData({
+      [examId]: { ...exam },
     });
-    setShowForm(true);
+    setEditingRowId(examId);
+  };
+
+  const saveEdit = async (examId) => {
+    const data = editingData[examId];
+
+    if (!data.title || !data.subject || !data.code || !data.date || !data.totalMarks) {
+      showNotification('Please fill in all required fields', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/exams/${examId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: data.title,
+          subject: data.subject,
+          code: data.code,
+          date: data.date,
+          startTime: data.startTime,
+          endTime: data.endTime,
+          totalMarks: data.totalMarks,
+          duration: data.duration,
+          description: data.description,
+          status: data.status,
+        }),
+      });
+
+      if (response.ok) {
+        showNotification('Exam updated successfully', 'success');
+        setEditingRowId(null);
+        setEditingData({});
+        fetchExams();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update exam');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showNotification(error.message, 'error');
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingRowId(null);
+    setEditingData({});
   };
 
   const handleDelete = async (id) => {
@@ -175,63 +250,6 @@ function ExamAdmin() {
     setShowDetailsModal(true);
   };
 
-  const handleUploadResults = async (e) => {
-    e.preventDefault();
-
-    if (!uploadFile) {
-      showNotification('Please select a file', 'error');
-      return;
-    }
-
-    try {
-      setUploading(true);
-      const formDataToSend = new FormData();
-      formDataToSend.append('file', uploadFile);
-
-      const response = await fetch(
-        `${API_BASE_URL}/exams/${uploadingExamId}/upload-results`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          body: formDataToSend,
-        }
-      );
-
-      if (response.ok) {
-        showNotification('Exam results uploaded successfully', 'success');
-        setUploadingExamId(null);
-        setUploadFile(null);
-        fetchExams();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to upload results');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      showNotification(error.message, 'error');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      subject: '',
-      date: '',
-      startTime: '',
-      endTime: '',
-      totalMarks: '',
-      duration: '',
-      description: '',
-      status: 'Scheduled',
-    });
-    setEditingId(null);
-    setShowForm(false);
-  };
-
   const showNotification = (msg, type) => {
     setMessage(msg);
     setMessageType(type);
@@ -242,6 +260,12 @@ function ExamAdmin() {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
+  const displayDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -254,9 +278,14 @@ function ExamAdmin() {
   return (
     <div className="exam-admin-container">
       <div className="exam-admin-header">
-        <h1>Exam Management</h1>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : '+ Add New Exam'}
+        <div className="institution-header">
+          <h2 className="institution-name">Easter University Sri Lanka</h2>
+          <p className="campus-name">Trincomalee Campus</p>
+          <p className="faculty-info">Faculty of Applied Science | Department of Computer Science</p>
+          <h1 className="exam-title">📋 Examination Time Table</h1>
+        </div>
+        <button className="btn btn-primary" onClick={addNewRow}>
+          + Add New Row
         </button>
       </div>
 
@@ -266,140 +295,11 @@ function ExamAdmin() {
         </div>
       )}
 
-      {showForm && (
-        <div className="exam-form-section">
-          <h2>{editingId ? 'Edit Exam' : 'Create New Exam'}</h2>
-          <form onSubmit={handleSubmit} className="exam-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="title">Exam Title *</label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="Enter exam title"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="subject">Subject *</label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  placeholder="Enter subject"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="date">Date *</label>
-                <input
-                  type="date"
-                  id="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="startTime">Start Time</label>
-                <input
-                  type="time"
-                  id="startTime"
-                  name="startTime"
-                  value={formData.startTime}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="endTime">End Time</label>
-                <input
-                  type="time"
-                  id="endTime"
-                  name="endTime"
-                  value={formData.endTime}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="totalMarks">Total Marks *</label>
-                <input
-                  type="number"
-                  id="totalMarks"
-                  name="totalMarks"
-                  value={formData.totalMarks}
-                  onChange={handleInputChange}
-                  placeholder="Enter total marks"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="duration">Duration (minutes)</label>
-                <input
-                  type="number"
-                  id="duration"
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                  placeholder="Duration in minutes"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="status">Status</label>
-                <select
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                >
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="Ongoing">Ongoing</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Enter exam description"
-                rows="3"
-              />
-            </div>
-
-            <div className="form-actions">
-              <button type="submit" className="btn btn-success">
-                {editingId ? 'Update Exam' : 'Create Exam'}
-              </button>
-              <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                Clear
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
       <div className="exam-filters-section">
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search by exam title or subject..."
+            placeholder="Search by exam title, subject, or code..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -422,61 +322,236 @@ function ExamAdmin() {
       </div>
 
       <div className="exam-list-section">
-        <h2>Exams ({filteredExams.length})</h2>
+        <h2>Exam Timetable ({filteredExams.length + newRows.length})</h2>
         {loading ? (
           <div className="loading">Loading exams...</div>
-        ) : filteredExams.length === 0 ? (
-          <div className="no-data">No exams found</div>
+        ) : filteredExams.length === 0 && newRows.length === 0 ? (
+          <div className="no-data">No exams found. Click "Add New Row" to create one.</div>
         ) : (
           <div className="exam-table-wrapper">
-            <table className="exam-table">
+            <table className="exam-table timetable">
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>Subject</th>
                   <th>Date</th>
-                  <th>Total Marks</th>
-                  <th>Status</th>
+                  <th>Subject</th>
+                  <th>Code</th>
+                  <th>Title</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Duration (min)</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredExams.map((exam) => (
-                  <tr key={exam._id}>
-                    <td>{exam.title}</td>
-                    <td>{exam.subject}</td>
-                    <td>{formatDate(exam.date)}</td>
-                    <td>{exam.totalMarks}</td>
+                {/* New Rows */}
+                {newRows.map((row) => (
+                  <tr key={row.id} className="new-row">
                     <td>
-                      <span className={`status-badge status-${exam.status.toLowerCase()}`}>
-                        {exam.status}
-                      </span>
+                      <input
+                        type="date"
+                        value={row.date}
+                        onChange={(e) => handleNewRowChange(row.id, 'date', e.target.value)}
+                        className="cell-input"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        value={row.subject}
+                        onChange={(e) => handleNewRowChange(row.id, 'subject', e.target.value)}
+                        className="cell-input"
+                        placeholder="Subject"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        value={row.code}
+                        onChange={(e) => handleNewRowChange(row.id, 'code', e.target.value)}
+                        className="cell-input"
+                        placeholder="Code"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        value={row.title}
+                        onChange={(e) => handleNewRowChange(row.id, 'title', e.target.value)}
+                        className="cell-input"
+                        placeholder="Title"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="time"
+                        value={row.startTime}
+                        onChange={(e) => handleNewRowChange(row.id, 'startTime', e.target.value)}
+                        className="cell-input"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="time"
+                        value={row.endTime}
+                        onChange={(e) => handleNewRowChange(row.id, 'endTime', e.target.value)}
+                        className="cell-input"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={row.duration}
+                        onChange={(e) => handleNewRowChange(row.id, 'duration', e.target.value)}
+                        className="cell-input"
+                        placeholder="mins"
+                      />
                     </td>
                     <td className="action-buttons">
                       <button
-                        className="btn btn-sm btn-info"
-                        onClick={() => handleViewDetails(exam)}
+                        className="btn btn-sm btn-success"
+                        onClick={() => saveNewRow(row.id)}
                       >
-                        View
+                        Save
                       </button>
                       <button
-                        className="btn btn-sm btn-warning"
-                        onClick={() => handleEdit(exam)}
+                        className="btn btn-sm btn-secondary"
+                        onClick={() => cancelNewRow(row.id)}
                       >
-                        Edit
+                        Cancel
                       </button>
-                      <button
-                        className="btn btn-sm btn-upload"
-                        onClick={() => setUploadingExamId(exam._id)}
-                      >
-                        Upload
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(exam._id)}
-                      >
-                        Delete
-                      </button>
+                    </td>
+                  </tr>
+                ))}
+
+                {/* Existing Exams */}
+                {filteredExams.map((exam) => (
+                  <tr key={exam._id} className={`status-${exam.status.toLowerCase()}`}>
+                    <td className="date-cell">
+                      {editingRowId === exam._id ? (
+                        <input
+                          type="date"
+                          value={formatDate(editingData[exam._id]?.date)}
+                          onChange={(e) => handleEditChange(exam._id, 'date', e.target.value)}
+                          className="cell-input"
+                        />
+                      ) : (
+                        displayDate(exam.date)
+                      )}
+                    </td>
+                    <td className="subject-cell">
+                      {editingRowId === exam._id ? (
+                        <input
+                          type="text"
+                          value={editingData[exam._id]?.subject}
+                          onChange={(e) => handleEditChange(exam._id, 'subject', e.target.value)}
+                          className="cell-input"
+                        />
+                      ) : (
+                        exam.subject
+                      )}
+                    </td>
+                    <td className="code-cell">
+                      {editingRowId === exam._id ? (
+                        <input
+                          type="text"
+                          value={editingData[exam._id]?.code}
+                          onChange={(e) => handleEditChange(exam._id, 'code', e.target.value)}
+                          className="cell-input"
+                        />
+                      ) : (
+                        <span className="code-badge">{exam.code}</span>
+                      )}
+                    </td>
+                    <td className="title-cell">
+                      {editingRowId === exam._id ? (
+                        <input
+                          type="text"
+                          value={editingData[exam._id]?.title}
+                          onChange={(e) => handleEditChange(exam._id, 'title', e.target.value)}
+                          className="cell-input"
+                        />
+                      ) : (
+                        exam.title
+                      )}
+                    </td>
+                    <td className="time-cell">
+                      {editingRowId === exam._id ? (
+                        <input
+                          type="time"
+                          value={editingData[exam._id]?.startTime}
+                          onChange={(e) => handleEditChange(exam._id, 'startTime', e.target.value)}
+                          className="cell-input"
+                        />
+                      ) : (
+                        exam.startTime || 'N/A'
+                      )}
+                    </td>
+                    <td className="time-cell">
+                      {editingRowId === exam._id ? (
+                        <input
+                          type="time"
+                          value={editingData[exam._id]?.endTime}
+                          onChange={(e) => handleEditChange(exam._id, 'endTime', e.target.value)}
+                          className="cell-input"
+                        />
+                      ) : (
+                        exam.endTime || 'N/A'
+                      )}
+                    </td>
+                    <td className="duration-cell">
+                      {editingRowId === exam._id ? (
+                        <input
+                          type="number"
+                          value={editingData[exam._id]?.duration}
+                          onChange={(e) => handleEditChange(exam._id, 'duration', e.target.value)}
+                          className="cell-input"
+                        />
+                      ) : (
+                        exam.duration
+                      )}
+                    </td>
+                    <td className="action-buttons">
+                      {editingRowId === exam._id ? (
+                        <>
+                          <button
+                            className="btn btn-sm btn-success"
+                            onClick={() => saveEdit(exam._id)}
+                          >
+                            Save
+                          </button>
+                          <button
+                            className="btn btn-sm btn-secondary"
+                            onClick={cancelEdit}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            className="btn btn-sm btn-info"
+                            onClick={() => handleViewDetails(exam)}
+                          >
+                            View
+                          </button>
+                          <button
+                            className="btn btn-sm btn-warning"
+                            onClick={() => startEdit(exam._id)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn btn-sm btn-danger"
+                            onClick={() => handleDelete(exam._id)}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -486,6 +561,7 @@ function ExamAdmin() {
         )}
       </div>
 
+      {/* Details Modal */}
       {showDetailsModal && selectedExam && (
         <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -508,91 +584,39 @@ function ExamAdmin() {
                 <span className="detail-value">{selectedExam.subject}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Date:</span>
-                <span className="detail-value">{formatDate(selectedExam.date)}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Time:</span>
+                <span className="detail-label">Code:</span>
                 <span className="detail-value">
-                  {selectedExam.startTime} - {selectedExam.endTime}
+                  <span className="code-badge">{selectedExam.code}</span>
                 </span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Total Marks:</span>
-                <span className="detail-value">{selectedExam.totalMarks}</span>
+                <span className="detail-label">Date:</span>
+                <span className="detail-value">{displayDate(selectedExam.date)}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Start Time:</span>
+                <span className="detail-value">{selectedExam.startTime || 'N/A'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">End Time:</span>
+                <span className="detail-value">{selectedExam.endTime || 'N/A'}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Duration:</span>
                 <span className="detail-value">{selectedExam.duration} minutes</span>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">Status:</span>
-                <span className={`status-badge status-${selectedExam.status.toLowerCase()}`}>
-                  {selectedExam.status}
-                </span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Description:</span>
-                <span className="detail-value">{selectedExam.description || 'N/A'}</span>
-              </div>
+              {selectedExam.description && (
+                <div className="detail-row">
+                  <span className="detail-label">Description:</span>
+                  <span className="detail-value">{selectedExam.description}</span>
+                </div>
+              )}
             </div>
             <div className="modal-footer">
-              <button
-                className="btn btn-secondary"
-                onClick={() => setShowDetailsModal(false)}
-              >
+              <button className="btn btn-secondary" onClick={() => setShowDetailsModal(false)}>
                 Close
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {uploadingExamId && (
-        <div className="modal-overlay" onClick={() => setUploadingExamId(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Upload Exam Results</h2>
-              <button
-                className="close-btn"
-                onClick={() => setUploadingExamId(null)}
-              >
-                ×
-              </button>
-            </div>
-            <form onSubmit={handleUploadResults}>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label htmlFor="uploadFile">Select Excel File</label>
-                  <input
-                    type="file"
-                    id="uploadFile"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={(e) => setUploadFile(e.target.files[0])}
-                    required
-                  />
-                  <small className="file-help">
-                    Supported formats: Excel (.xlsx, .xls) or CSV
-                  </small>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setUploadingExamId(null)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-success"
-                  disabled={uploading}
-                >
-                  {uploading ? 'Uploading...' : 'Upload Results'}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

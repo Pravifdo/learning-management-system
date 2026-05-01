@@ -5,7 +5,7 @@
 .course-uploads-container {
   padding: 0;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f3f4f6;
 }
 
 .navbar {
@@ -43,8 +43,8 @@
 
 .navbar button {
   padding: 10px 20px;
-  background: white;
-  color: #667eea;
+  background: #2563eb;
+  color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -117,15 +117,15 @@
 }
 
 .filter-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #2563eb;
+  color: #2563eb;
 }
 
 .filter-btn.active {
-  background: #667eea;
+  background: #2563eb;
   color: white;
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .loading-state,
@@ -180,11 +180,11 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
 }
 
 .upload-card.notes {
-  border-left: 5px solid #667eea;
+  border-left: 5px solid #2563eb;
 }
 
 .upload-card.assignment {
@@ -274,7 +274,7 @@
 
 .download-btn {
   padding: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 8px;
@@ -287,7 +287,7 @@
 
 .download-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .download-btn:active {

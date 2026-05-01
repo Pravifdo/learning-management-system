@@ -8,6 +8,7 @@ import LecturerDashboard from './pages/lecturer/LecturerDashboard';
 import LecturerStudentDetail from './pages/lecturer/LecturerStudentDetail';
 import StudentDetail from './pages/student/StudentDetail';
 import StudentAccount from './pages/student/StudentAccount';
+import StudentExams from './pages/student/StudentExams';
 import LecturerUpload from './pages/lecturer/LecturerUpload';
 import LecturerUploads from './pages/lecturer/LecturerUploads';
 import CourseUploads from './pages/student/CourseUploads';
@@ -134,8 +135,8 @@ function AppRoutes() {
         element={<RoleRoute element={<Settings />} allowedRole="admin" />}
       />
       <Route
-        path="/exams"
-        element={<ProtectedRoute element={<ExamAdmin />} />}
+        path="/student/exams"
+        element={<RoleRoute element={<StudentExams />} allowedRole="student" />}
       />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -5,8 +5,8 @@
 
 :root {
   /* Primary Campus Colors */
-  --primary-blue: #1a4d8c;
-  --primary-dark: #0e3570;
+  --primary-blue: #2563eb;
+  --primary-dark: #1e40af;
   --primary-light: #2b6cb0;
   --accent-gold: #d4af37;
   --accent-teal: #2c7a7b;
@@ -51,7 +51,7 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f3f4f6;
   min-height: 100vh;
 }
 
@@ -133,7 +133,7 @@ body {
   display: block;
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold));
+  background: #2563eb;
   margin: 0.75rem auto 0;
   border-radius: 2px;
 }
@@ -181,13 +181,13 @@ form {
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(26, 77, 140, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   transform: translateY(-1px);
 }
 
 .form-group input:hover {
-  border-color: var(--primary-light);
+  border-color: #2563eb;
 }
 
 .form-group input::placeholder {
@@ -225,7 +225,7 @@ form {
 button[type="submit"] {
   width: 100%;
   padding: 0.875rem;
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  background: #2563eb;
   color: var(--white);
   border: none;
   border-radius: var(--radius-md);
@@ -255,7 +255,7 @@ button[type="submit"]::before {
 button[type="submit"]:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
-  background: linear-gradient(135deg, var(--primary-light), var(--primary-blue));
+  background: #1e40af;
 }
 
 button[type="submit"]:hover::before {
