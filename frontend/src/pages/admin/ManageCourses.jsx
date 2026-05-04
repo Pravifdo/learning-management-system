@@ -14,12 +14,15 @@ function ManageCourses() {
   const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedSemester, setSelectedSemester] = useState('1');
 
   const [formData, setFormData] = useState({
     courseName: '',
     courseCode: '',
     description: '',
     credits: '',
+    year: new Date().getFullYear().toString(),
     semester: '1',
     lecturer: '',
   });
@@ -33,7 +36,7 @@ function ManageCourses() {
 
   useEffect(() => {
     filterCourses();
-  }, [courses, searchTerm]);
+  }, [courses, searchTerm, selectedYear, selectedSemester]);
 
   const fetchCourses = async () => {
     try {
@@ -65,6 +68,11 @@ function ManageCourses() {
           course.courseCode?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+    filtered = filtered.filter(
+      (course) =>
+        (course.year?.toString() === selectedYear || !selectedYear) &&
+        (course.semester?.toString() === selectedSemester || !selectedSemester)
+    );
     setFilteredCourses(filtered);
   };
 
@@ -144,6 +152,7 @@ function ManageCourses() {
       courseCode: '',
       description: '',
       credits: '',
+      year: new Date().getFullYear().toString(),
       semester: '1',
       lecturer: '',
     });
@@ -184,13 +193,7 @@ function ManageCourses() {
           </div>
         )}
 
-        <div className="header-section">
-          <h2>Courses Management</h2>
-          <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : '+ Add New Course'}
-          </button>
-        </div>
-
+      
         {showForm && (
           <div className="form-container">
             <h3>{editingId ? 'Edit Course' : 'Create New Course'}</h3>
@@ -235,6 +238,21 @@ function ManageCourses() {
                     min="1"
                     max="10"
                   />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="year">Year</label>
+                  <select
+                    id="year"
+                    name="year"
+                    value={formData.year}
+                    onChange={handleInputChange}
+                  >
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label htmlFor="semester">Semester</label>
@@ -301,8 +319,44 @@ function ManageCourses() {
           />
         </div>
 
+        <div className="filter-section">
+          <div className="filter-group">
+            <label htmlFor="filterYear">Year:</label>
+            <select
+              id="filterYear"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label htmlFor="filterSemester">Semester:</label>
+            <select
+              id="filterSemester"
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+            >
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </div>
+        </div>
+
         <div className="courses-section">
-          <h3>Courses ({filteredCourses.length})</h3>
+          <div className="table-header-info">
+            <h3>Courses ({filteredCourses.length}) - Year: {selectedYear} | Semester: {selectedSemester}</h3>
+          </div>
           {loading ? (
             <div className="loading">Loading courses...</div>
           ) : filteredCourses.length === 0 ? (
@@ -314,6 +368,7 @@ function ManageCourses() {
                   <tr>
                     <th>Course Code</th>
                     <th>Course Name</th>
+                    <th>Year</th>
                     <th>Semester</th>
                     <th>Credits</th>
                     <th>Lecturer</th>
@@ -325,6 +380,7 @@ function ManageCourses() {
                     <tr key={course._id}>
                       <td>{course.courseCode}</td>
                       <td>{course.courseName}</td>
+                      <td>{course.year || 'N/A'}</td>
                       <td>Sem {course.semester}</td>
                       <td>{course.credits}</td>
                       <td>{course.lecturer || 'N/A'}</td>

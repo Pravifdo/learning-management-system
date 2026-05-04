@@ -14,6 +14,7 @@ import LecturerUploads from './pages/lecturer/LecturerUploads';
 import CourseUploads from './pages/student/CourseUploads';
 import MyCourses from './pages/student/myCouses';
 import ExamAdmin from './pages/admin/ExamAdmin.jsx';
+import ExamTimeTable from './pages/admin/ExamTimeTable.jsx';
 import ManageUsers from './pages/admin/ManageUsers.jsx';
 import ManageCourses from './pages/admin/ManageCourses.jsx';
 import SystemReports from './pages/admin/SystemReports.jsx';
@@ -117,6 +118,10 @@ function AppRoutes() {
       <Route
         path="/admin/exams"
         element={<RoleRoute element={<ExamAdmin />} allowedRole="admin" />}
+      />
+      <Route
+        path="/admin/timetable"
+        element={<RoleRoute element={<ExamTimeTable />} allowedRole="admin" />}
       />
       <Route
         path="/admin/users"

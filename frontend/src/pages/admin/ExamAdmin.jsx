@@ -382,15 +382,21 @@ function ExamAdmin() {
       <div className="exam-list-section">
         <div className="exam-list-header">
           <h2>📚 Exam Topics Timetable</h2>
-         
+          
         </div>
         {loading ? (
           <div className="loading">Loading exams...</div>
         ) : filteredExams.length === 0 && newRows.length === 0 ? (
-          <div className="no-data">No exams found. Click "Add New Row" to create one.</div>
+          <div className="no-data">
+            <p>No exams found. Click "Add New Row" to create one.</p>
+            <button className="btn btn-primary" onClick={addNewRow} style={{ marginTop: '1rem' }}>
+              + Add New Row
+            </button>
+          </div>
         ) : (
-          <div className="exam-table-wrapper">
-            <table className="exam-table timetable">
+          <>
+            <div className="exam-table-wrapper">
+              <table className="exam-table timetable">
               <thead>
                 <tr>
                   <th>Date</th>
@@ -571,12 +577,16 @@ function ExamAdmin() {
                     </td>
                   </tr>
                 ))}
+
+                
               </tbody>
             </table>
-             <button className="btn btn-primary" onClick={addNewRow}>
-            + Add New Row
-          </button>
-          </div>
+            </div>
+
+            <button className="btn btn-primary" onClick={addNewRow} style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+              + Add New Row
+            </button>
+          </>
         )}
       </div>
 
