@@ -19,6 +19,7 @@ function ExamTimeTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const EXAMS_PER_PAGE = 10;
 
+  const [editableRows, setEditableRows] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     subject: '',
@@ -75,14 +76,14 @@ function ExamTimeTable() {
     );
     filtered = filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
     setFilteredExams(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value === 'year' ? parseInt(value) : value,
+      [name]: name === 'year' ? parseInt(value) : value,
     });
   };
 
@@ -135,7 +136,7 @@ function ExamTimeTable() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this exam from the timetable?')) {
+    if (window.confirm('Are you sure you want to delete this exam?')) {
       try {
         const response = await fetch(`${API_BASE_URL}/exams/${id}`, {
           method: 'DELETE',
@@ -145,7 +146,7 @@ function ExamTimeTable() {
         });
 
         if (response.ok) {
-          showNotification('Exam removed from timetable', 'success');
+          showNotification('Exam deleted successfully', 'success');
           fetchExams();
         }
       } catch (error) {
@@ -184,12 +185,239 @@ function ExamTimeTable() {
     }, 3000);
   };
 
+  const loadSampleData = async () => {
+    const sampleExams = [
+      {
+        title: 'Mathematics Final Examination',
+        subject: 'Mathematics',
+        code: 'MATH101-FIN',
+        topic: 'Calculus, Algebra, Geometry',
+        date: new Date(2026, 4, 20).toISOString().split('T')[0],
+        startTime: '09:00',
+        endTime: '11:00',
+        duration: '120',
+        totalMarks: '100',
+        year: 2026,
+        semester: '1',
+        status: 'Scheduled',
+        description: 'Final examination covering chapters 1-12. Calculator allowed.'
+      },
+      {
+        title: 'English Literature Mid-Term',
+        subject: 'English Literature',
+        code: 'ENG201-MID',
+        topic: 'Shakespeare, Poetry, Modern Literature',
+        date: new Date(2026, 4, 22).toISOString().split('T')[0],
+        startTime: '10:30',
+        endTime: '12:30',
+        duration: '120',
+        totalMarks: '75',
+        year: 2026,
+        semester: '1',
+        status: 'Scheduled',
+        description: 'Essay-based exam. Three questions - choose two.'
+      },
+      {
+        title: 'Physics Practical Examination',
+        subject: 'Physics',
+        code: 'PHY301-LAB',
+        topic: 'Optics, Electricity, Mechanics',
+        date: new Date(2026, 4, 25).toISOString().split('T')[0],
+        startTime: '14:00',
+        endTime: '16:00',
+        duration: '120',
+        totalMarks: '50',
+        year: 2026,
+        semester: '1',
+        status: 'Scheduled',
+        description: 'Laboratory practical exam. 5 experiments to perform.'
+      },
+      {
+        title: 'Chemistry Comprehensive Final',
+        subject: 'Chemistry',
+        code: 'CHEM101-COMP',
+        topic: 'Organic Chemistry, Inorganic Chemistry, Physical Chemistry',
+        date: new Date(2026, 5, 1).toISOString().split('T')[0],
+        startTime: '09:00',
+        endTime: '11:30',
+        duration: '150',
+        totalMarks: '100',
+        year: 2026,
+        semester: '2',
+        status: 'Scheduled',
+        description: 'Comprehensive final exam covering entire course.'
+      },
+      {
+        title: 'Biology Semester Exam',
+        subject: 'Biology',
+        code: 'BIO102-SEM',
+        topic: 'Cell Biology, Genetics, Evolution, Ecology',
+        date: new Date(2026, 5, 3).toISOString().split('T')[0],
+        startTime: '13:00',
+        endTime: '15:00',
+        duration: '120',
+        totalMarks: '80',
+        year: 2026,
+        semester: '2',
+        status: 'Scheduled',
+        description: 'Multiple choice and short answer format.'
+      }
+    ];
+
+    try {
+      let successCount = 0;
+      for (const exam of sampleExams) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/exams`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(exam),
+          });
+
+          if (response.ok) {
+            successCount++;
+          }
+        } catch (err) {
+          console.error('Error adding exam:', err);
+        }
+      }
+
+      showNotification(`Sample data loaded! ${successCount} exams added.`, 'success');
+      fetchExams();
+    } catch (error) {
+      console.error('Error loading sample data:', error);
+      showNotification('Error loading sample data', 'error');
+    }
+  };
+
+  const addNewTableRow = () => {
+    const newRow = {
+      id: `new-${Date.now()}`,
+      _id: null,
+      title: '',
+      subject: '',
+      code: '',
+      date: '',
+      startTime: '',
+      endTime: '',
+      duration: '',
+      isSaving: false,
+    };
+    setEditableRows([...editableRows, newRow]);
+  };
+
+  const updateTableCell = (index, field, value) => {
+    const updatedRows = [...editableRows];
+    updatedRows[index] = {
+      ...updatedRows[index],
+      [field]: value,
+    };
+    setEditableRows(updatedRows);
+  };
+
+  const deleteTableRow = async (index) => {
+    const row = editableRows[index];
+    
+    if (row._id) {
+      // Existing exam - confirm deletion
+      if (window.confirm('Delete this exam?')) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/exams/${row._id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            showNotification('Exam deleted successfully', 'success');
+            setEditableRows(editableRows.filter((_, i) => i !== index));
+            fetchExams();
+          }
+        } catch (error) {
+          console.error('Error deleting exam:', error);
+          showNotification('Error deleting exam', 'error');
+        }
+      }
+    } else {
+      // New row - just remove it
+      setEditableRows(editableRows.filter((_, i) => i !== index));
+    }
+  };
+
+  const saveTableRow = async (index) => {
+    const row = editableRows[index];
+
+    // Validation
+    if (!row.title || !row.code || !row.date || !row.startTime) {
+      showNotification('Please fill in all required fields (Title, Code, Date, Start Time)', 'error');
+      return;
+    }
+
+    try {
+      // Update saving state
+      const updatedRows = [...editableRows];
+      updatedRows[index] = { ...row, isSaving: true };
+      setEditableRows(updatedRows);
+
+      // Prepare data with year/semester/status from filters or defaults
+      const examData = {
+        title: row.title,
+        subject: row.subject,
+        code: row.code,
+        date: row.date,
+        startTime: row.startTime,
+        endTime: row.endTime,
+        duration: row.duration,
+        year: parseInt(selectedYear),
+        semester: selectedSemester,
+        status: 'Scheduled',
+        description: '',
+        topic: '',
+        totalMarks: '',
+      };
+
+      const method = row._id ? 'PUT' : 'POST';
+      const url = row._id ? `${API_BASE_URL}/exams/${row._id}` : `${API_BASE_URL}/exams`;
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(examData),
+      });
+
+      if (response.ok) {
+        showNotification(row._id ? 'Exam updated successfully' : 'Exam added successfully', 'success');
+        setEditableRows(editableRows.filter((_, i) => i !== index));
+        fetchExams();
+      } else {
+        const error = await response.json();
+        showNotification(error.message || 'Error saving exam', 'error');
+        // Reset saving state
+        updatedRows[index] = { ...row, isSaving: false };
+        setEditableRows(updatedRows);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showNotification('Error saving exam', 'error');
+      // Reset saving state
+      const updatedRows = [...editableRows];
+      updatedRows[index] = { ...row, isSaving: false };
+      setEditableRows(updatedRows);
+    }
+  };
+
   const formatDate = (dateString) => {
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
-  // Pagination functions
   const getPaginatedExams = () => {
     const startIndex = (currentPage - 1) * EXAMS_PER_PAGE;
     const endIndex = startIndex + EXAMS_PER_PAGE;
@@ -226,190 +454,124 @@ function ExamTimeTable() {
         </div>
 
         {showForm && (
-          <div className="form-container">
-            <h3>{editingId ? 'Edit Exam' : 'Add Exam to Timetable'}</h3>
-            <form onSubmit={handleSubmit} className="exam-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="title">Exam Title *</label>
-                  <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Mathematics Final"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="code">Exam Code *</label>
-                  <input
-                    type="text"
-                    id="code"
-                    name="code"
-                    value={formData.code}
-                    onChange={handleInputChange}
-                    placeholder="e.g., MATH101-FIN"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="subject">Subject *</label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    placeholder="Enter subject name"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="topic">Topic</label>
-                  <input
-                    type="text"
-                    id="topic"
-                    name="topic"
-                    value={formData.topic}
-                    onChange={handleInputChange}
-                    placeholder="Enter topic"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="date">Exam Date *</label>
-                  <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="startTime">Start Time *</label>
-                  <input
-                    type="time"
-                    id="startTime"
-                    name="startTime"
-                    value={formData.startTime}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="endTime">End Time</label>
-                  <input
-                    type="time"
-                    id="endTime"
-                    name="endTime"
-                    value={formData.endTime}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="duration">Duration (minutes)</label>
-                  <input
-                    type="number"
-                    id="duration"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleInputChange}
-                    placeholder="e.g., 120"
-                    min="1"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="totalMarks">Total Marks</label>
-                  <input
-                    type="number"
-                    id="totalMarks"
-                    name="totalMarks"
-                    value={formData.totalMarks}
-                    onChange={handleInputChange}
-                    placeholder="e.g., 100"
-                    min="1"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="year">Year *</label>
-                  <select
-                    id="year"
-                    name="year"
-                    value={formData.year}
-                    onChange={handleInputChange}
-                  >
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="semester">Semester *</label>
-                  <select
-                    id="semester"
-                    name="semester"
-                    value={formData.semester}
-                    onChange={handleInputChange}
-                  >
-                    <option value="1">Semester 1</option>
-                    <option value="2">Semester 2</option>
-                    <option value="Special">Special</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="status">Status</label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Scheduled">Scheduled</option>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder="Enter exam description"
-                  rows="3"
-                />
-              </div>
-
-              <div className="form-actions">
-                <button type="submit" className="btn-submit">
-                  {editingId ? 'Update Exam' : 'Add to Timetable'}
-                </button>
-                <button type="button" className="btn-cancel" onClick={resetForm}>
-                  Clear
-                </button>
-              </div>
-            </form>
+          <div className="editable-table-container">
+            <h3>Add/Edit Exams - Enter Data Directly</h3>
+            <div className="editable-table-wrapper">
+              <table className="editable-input-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration (min)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {editableRows.map((row, index) => (
+                    <tr key={row.id} className={row.isSaving ? 'saving' : ''}>
+                      <td>
+                        <input
+                          type="text"
+                          value={row.title}
+                          onChange={(e) => updateTableCell(index, 'title', e.target.value)}
+                          placeholder="Exam title"
+                          disabled={row.isSaving}
+                          className="editable-input"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          value={row.subject}
+                          onChange={(e) => updateTableCell(index, 'subject', e.target.value)}
+                          placeholder="Subject"
+                          disabled={row.isSaving}
+                          className="editable-input"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          value={row.code}
+                          onChange={(e) => updateTableCell(index, 'code', e.target.value)}
+                          placeholder="Code"
+                          disabled={row.isSaving}
+                          className="editable-input"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="date"
+                          value={row.date}
+                          onChange={(e) => updateTableCell(index, 'date', e.target.value)}
+                          disabled={row.isSaving}
+                          className="editable-input"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="time"
+                          value={row.startTime}
+                          onChange={(e) => updateTableCell(index, 'startTime', e.target.value)}
+                          disabled={row.isSaving}
+                          className="editable-input"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="time"
+                          value={row.endTime}
+                          onChange={(e) => updateTableCell(index, 'endTime', e.target.value)}
+                          disabled={row.isSaving}
+                          className="editable-input"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={row.duration}
+                          onChange={(e) => updateTableCell(index, 'duration', e.target.value)}
+                          placeholder="120"
+                          disabled={row.isSaving}
+                          className="editable-input"
+                          min="1"
+                        />
+                      </td>
+                      <td className="action-buttons">
+                        <button
+                          className="btn-save"
+                          onClick={() => saveTableRow(index)}
+                          disabled={row.isSaving}
+                          title="Save"
+                        >
+                          {row.isSaving ? '⏳' : '💾'}
+                        </button>
+                        <button
+                          className="btn-delete"
+                          onClick={() => deleteTableRow(index)}
+                          disabled={row.isSaving}
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="editable-table-controls">
+              <button className="btn-add-row" onClick={addNewTableRow}>
+                ➕ Add Row
+              </button>
+              {editableRows.length > 0 && (
+                <span className="row-count">{editableRows.length} row(s) ready to save</span>
+              )}
+            </div>
           </div>
         )}
 
@@ -439,6 +601,15 @@ function ExamTimeTable() {
               <option value="2">Semester 2</option>
               <option value="Special">Special</option>
             </select>
+          </div>
+          <div className="filter-group">
+            <button 
+              className="btn-load-sample"
+              onClick={loadSampleData}
+              title="Load sample exam data"
+            >
+              📋 Load Sample Data
+            </button>
           </div>
         </div>
 
@@ -502,6 +673,7 @@ function ExamTimeTable() {
                     <th>Exam Code</th>
                     <th>Title</th>
                     <th>Subject</th>
+                    <th>Topic</th>
                     <th>Duration</th>
                     <th>Marks</th>
                     <th>Status</th>
@@ -516,6 +688,7 @@ function ExamTimeTable() {
                       <td><strong>{exam.code}</strong></td>
                       <td>{exam.title}</td>
                       <td>{exam.subject}</td>
+                      <td>{exam.topic || '-'}</td>
                       <td>{exam.duration} min</td>
                       <td>{exam.totalMarks}</td>
                       <td><span className={`status-badge status-${exam.status}`}>{exam.status}</span></td>
@@ -565,8 +738,16 @@ function ExamTimeTable() {
           )}
 
           <div className="add-button-section">
-            <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
-              {showForm ? 'Cancel' : '+ Add Exam to Timetable'}
+            <button 
+              className="btn-primary" 
+              onClick={() => {
+                setShowForm(!showForm);
+                if (showForm) {
+                  setEditableRows([]);
+                }
+              }}
+            >
+              {showForm ? 'Close Table' : '+ Add Exam to Timetable'}
             </button>
           </div>
         </div>
