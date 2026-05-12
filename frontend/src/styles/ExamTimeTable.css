@@ -752,7 +752,7 @@
 /* Editable Table Styles */
 .editable-table-container {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  padding: 25px;
+  padding: 20px;
   border-radius: 10px;
   margin-bottom: 30px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -767,16 +767,12 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, #2563eb, #1e40af);
 }
 
 .editable-table-container h3 {
-  color: #1a3a6b;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  margin-top: 0;
+  display: none;
 }
 
 .editable-table-wrapper {

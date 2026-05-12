@@ -453,9 +453,51 @@ function ExamTimeTable() {
           <h2>Exam Schedule</h2>
         </div>
 
-        {showForm && (
-          <div className="editable-table-container">
-            <h3>Add/Edit Exams - Enter Data Directly</h3>
+        <div className="filter-section">
+          <div className="filter-group">
+            <label htmlFor="filterYear">Year:</label>
+            <select
+              id="filterYear"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label htmlFor="filterSemester">Semester:</label>
+            <select
+              id="filterSemester"
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+            >
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="Special">Special</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <button 
+              className="btn-load-sample"
+              onClick={loadSampleData}
+              title="Load sample exam data"
+            >
+              📋 Load Sample Data
+            </button>
+          </div>
+        </div>
+
+        <div className="timetable-section">
+          <div className="table-header-info">
+            <h3>Exams Schedule - Year: {selectedYear} | Semester: {selectedSemester}</h3>
+          </div>
+
+          {showForm && (
+            <div className="editable-table-container">
             <div className="editable-table-wrapper">
               <table className="editable-input-table">
                 <thead>
@@ -575,73 +617,79 @@ function ExamTimeTable() {
           </div>
         )}
 
-        <div className="filter-section">
-          <div className="filter-group">
-            <label htmlFor="filterYear">Year:</label>
-            <select
-              id="filterYear"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-            >
-              <option value="2024">2024</option>
-              <option value="2025">2025</option>
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-              <option value="2028">2028</option>
-            </select>
+        {loading ? (
+          <div className="loading">Loading exam schedule...</div>
+        ) : filteredExams.length > 0 && (
+          <div className="timetable-wrapper">
+            <div className="timetable-grid">
+              {filteredExams.map((exam) => (
+                <div key={exam._id} className={`exam-card exam-status-${exam.status}`}>
+                <div className="exam-header">
+                  <h4>{exam.title}</h4>
+                  <span className={`status-badge status-${exam.status}`}>{exam.status}</span>
+                </div>
+                <div className="exam-details">
+                  <p><strong>Code:</strong> {exam.code}</p>
+                  <p><strong>Subject:</strong> {exam.subject}</p>
+                  <p><strong>Date:</strong> {formatDate(exam.date)}</p>
+                  <p><strong>Time:</strong> {exam.startTime} - {exam.endTime}</p>
+                  <p><strong>Duration:</strong> {exam.duration} minutes</p>
+                  <p><strong>Total Marks:</strong> {exam.totalMarks}</p>
+                  {exam.topic && <p><strong>Topic:</strong> {exam.topic}</p>}
+                  {exam.description && <p className="description"><strong>Details:</strong> {exam.description}</p>}
+                </div>
+                <div className="exam-actions">
+                  <button
+                    className="btn-edit"
+                    onClick={() => handleEdit(exam)}
+                    title="Edit"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    className="btn-delete"
+                    onClick={() => handleDelete(exam._id)}
+                    title="Delete"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              ))}
+            </div>
           </div>
-          <div className="filter-group">
-            <label htmlFor="filterSemester">Semester:</label>
-            <select
-              id="filterSemester"
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-            >
-              <option value="1">Semester 1</option>
-              <option value="2">Semester 2</option>
-              <option value="Special">Special</option>
-            </select>
-          </div>
-          <div className="filter-group">
-            <button 
-              className="btn-load-sample"
-              onClick={loadSampleData}
-              title="Load sample exam data"
-            >
-              📋 Load Sample Data
-            </button>
-          </div>
-        </div>
+        )}
 
-        <div className="timetable-section">
-          <div className="table-header-info">
-            <h3>Exams Schedule - Year: {selectedYear} | Semester: {selectedSemester}</h3>
-          </div>
-
-          {loading ? (
-            <div className="loading">Loading exam schedule...</div>
-          ) : filteredExams.length === 0 ? (
-            <div className="no-data">No exams scheduled for this period</div>
-          ) : (
-            <div className="timetable-wrapper">
-              <div className="timetable-grid">
-                {filteredExams.map((exam) => (
-                  <div key={exam._id} className={`exam-card exam-status-${exam.status}`}>
-                    <div className="exam-header">
-                      <h4>{exam.title}</h4>
-                      <span className={`status-badge status-${exam.status}`}>{exam.status}</span>
-                    </div>
-                    <div className="exam-details">
-                      <p><strong>Code:</strong> {exam.code}</p>
-                      <p><strong>Subject:</strong> {exam.subject}</p>
-                      <p><strong>Date:</strong> {formatDate(exam.date)}</p>
-                      <p><strong>Time:</strong> {exam.startTime} - {exam.endTime}</p>
-                      <p><strong>Duration:</strong> {exam.duration} minutes</p>
-                      <p><strong>Total Marks:</strong> {exam.totalMarks}</p>
-                      {exam.topic && <p><strong>Topic:</strong> {exam.topic}</p>}
-                      {exam.description && <p className="description"><strong>Details:</strong> {exam.description}</p>}
-                    </div>
-                    <div className="exam-actions">
+        {filteredExams.length > 0 && (
+          <div className="timetable-table">
+            <table className="schedule-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Exam Code</th>
+                  <th>Title</th>
+                  <th>Subject</th>
+                  <th>Topic</th>
+                  <th>Duration</th>
+                  <th>Marks</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {getPaginatedExams().map((exam) => (
+                  <tr key={exam._id}>
+                    <td>{formatDate(exam.date)}</td>
+                    <td>{exam.startTime} - {exam.endTime}</td>
+                    <td><strong>{exam.code}</strong></td>
+                    <td>{exam.title}</td>
+                    <td>{exam.subject}</td>
+                    <td>{exam.topic || '-'}</td>
+                    <td>{exam.duration} min</td>
+                    <td>{exam.totalMarks}</td>
+                    <td><span className={`status-badge status-${exam.status}`}>{exam.status}</span></td>
+                    <td className="action-buttons">
                       <button
                         className="btn-edit"
                         onClick={() => handleEdit(exam)}
@@ -656,100 +704,49 @@ function ExamTimeTable() {
                       >
                         🗑️
                       </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {filteredExams.length > 0 && (
-            <div className="timetable-table">
-              <table className="schedule-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Exam Code</th>
-                    <th>Title</th>
-                    <th>Subject</th>
-                    <th>Topic</th>
-                    <th>Duration</th>
-                    <th>Marks</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {getPaginatedExams().map((exam) => (
-                    <tr key={exam._id}>
-                      <td>{formatDate(exam.date)}</td>
-                      <td>{exam.startTime} - {exam.endTime}</td>
-                      <td><strong>{exam.code}</strong></td>
-                      <td>{exam.title}</td>
-                      <td>{exam.subject}</td>
-                      <td>{exam.topic || '-'}</td>
-                      <td>{exam.duration} min</td>
-                      <td>{exam.totalMarks}</td>
-                      <td><span className={`status-badge status-${exam.status}`}>{exam.status}</span></td>
-                      <td className="action-buttons">
-                        <button
-                          className="btn-edit"
-                          onClick={() => handleEdit(exam)}
-                          title="Edit"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          className="btn-delete"
-                          onClick={() => handleDelete(exam._id)}
-                          title="Delete"
-                        >
-                          🗑️
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-          {filteredExams.length > 0 && (
-            <div className="pagination-controls">
-              <button 
-                className="btn-pagination" 
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-              >
-                ← Previous
-              </button>
-              <span className="pagination-info">
-                Page {currentPage} of {getTotalPages()} (Total: {filteredExams.length} exams)
-              </span>
-              <button 
-                className="btn-pagination" 
-                onClick={handleNextPage}
-                disabled={currentPage === getTotalPages()}
-              >
-                Next →
-              </button>
-            </div>
-          )}
-
-          <div className="add-button-section">
+        {filteredExams.length > 0 && (
+          <div className="pagination-controls">
             <button 
-              className="btn-primary" 
-              onClick={() => {
-                setShowForm(!showForm);
-                if (showForm) {
-                  setEditableRows([]);
-                }
-              }}
+              className="btn-pagination" 
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
             >
-              {showForm ? 'Close Table' : '+ Add Exam to Timetable'}
+              ← Previous
+            </button>
+            <span className="pagination-info">
+              Page {currentPage} of {getTotalPages()} (Total: {filteredExams.length} exams)
+            </span>
+            <button 
+              className="btn-pagination" 
+              onClick={handleNextPage}
+              disabled={currentPage === getTotalPages()}
+            >
+              Next →
             </button>
           </div>
+        )}
+        </div>
+
+        <div className="add-button-section">
+          <button 
+            className="btn-primary" 
+            onClick={() => {
+              setShowForm(!showForm);
+              if (showForm) {
+                setEditableRows([]);
+              }
+            }}
+          >
+            {showForm ? 'View Schedule' : '+ Add Exam to Timetable'}
+          </button>
         </div>
       </div>
     </PageLayout>
