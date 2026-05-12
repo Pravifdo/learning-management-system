@@ -52,22 +52,38 @@ function MyCourses() {
             {lecturers.map((lec) => (
               <div key={lec.id} className="course-card">
 
-                <h2>{lec.fullName}</h2>
+                <div style={{ borderBottom: '2px solid #2563eb', paddingBottom: '1rem' }}>
+                  <h2>{lec.fullName}</h2>
+                  <div style={{ 
+                    background: '#eff6ff', 
+                    padding: '0.75rem 1rem', 
+                    borderRadius: '8px',
+                    marginTop: '0.5rem',
+                    fontWeight: '700',
+                    color: '#2563eb',
+                    fontSize: '1rem'
+                  }}>
+                    📚 {lec.subject}
+                  </div>
+                </div>
 
-                <p><strong>Subject:</strong> {lec.subject}</p>
-                <p><strong>Department:</strong> {lec.department}</p>
-                <p><strong>Office Location:</strong> {lec.officeLocation}</p>
-                <p><strong>Office Hours:</strong> {lec.officeHours}</p>
+                <div style={{ flex: 1 }}>
+                  <p><strong>Department:</strong> {lec.department}</p>
+                  <p><strong>Office Location:</strong> {lec.officeLocation}</p>
+                  <p><strong>Office Hours:</strong> {lec.officeHours}</p>
 
-                {lec.bio && (
-                  <p><strong>Bio:</strong> {lec.bio}</p>
-                )}
+                  {lec.bio && (
+                    <p style={{ marginTop: '1rem', fontStyle: 'italic', color: '#6b7280' }}>
+                      <strong>Bio:</strong> {lec.bio}
+                    </p>
+                  )}
+                </div>
 
                 <button
                   className="view-btn"
                   onClick={() => navigate(`/lecturer/${lec.id}`)}
                 >
-                  View Details
+                  View Details →
                 </button>
 
               </div>

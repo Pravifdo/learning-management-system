@@ -93,7 +93,16 @@ function Signup() {
   };
 
   return (
-    <div className="signup-container">
+    <>
+      <nav className="auth-navbar">
+        <div className="auth-navbar-left">
+          <h1>📚 LMS</h1>
+        </div>
+        <div className="auth-navbar-right">
+          <p>Learning Management System</p>
+        </div>
+      </nav>
+      <div className="signup-container">
       <div className="signup-box">
         <h1>Create Account</h1>
         <form onSubmit={handleSubmit}>
@@ -194,7 +203,8 @@ function Signup() {
           <p>Already have an account? <Link to="/login">Login</Link></p>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

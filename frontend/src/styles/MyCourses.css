@@ -14,24 +14,48 @@
 
 .courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 2rem;
+  width: 100%;
 }
 
 .course-card {
-  background: #ffffff;
-  padding: 15px;
-  border-radius: 10px;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: 0.3s;
-  border-left: 4px solid #2563eb;
+  transition: all 0.3s ease;
+  border-left: 5px solid #2563eb;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+  cursor: pointer;
 }
 
 .course-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+  border-left-color: #1e40af;
+}
+
+.course-card h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.course-card p {
+  margin: 0.5rem 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.course-card p strong {
+  color: #2563eb;
+  font-weight: 700;
 }
 
 .course-header {
@@ -125,6 +149,58 @@
 
 .course-card h3 {
   margin-bottom: 10px;
+}
+
+.view-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+  margin-top: 1rem;
+}
+
+.view-btn:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.no-courses {
+  text-align: center;
+  color: #6b7280;
+  font-size: 1.1rem;
+  padding: 3rem 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .courses-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .course-card {
+    padding: 1.5rem;
+  }
+
+  .course-card h2 {
+    font-size: 1.2rem;
+  }
 }
 
 .view-btn {
