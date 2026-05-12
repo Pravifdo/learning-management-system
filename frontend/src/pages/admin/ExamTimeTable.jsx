@@ -16,6 +16,8 @@ function ExamTimeTable() {
   const [selectedSemester, setSelectedSemester] = useState('1');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const EXAMS_PER_PAGE = 10;
 
   const [formData, setFormData] = useState({
     title: '',
@@ -73,6 +75,7 @@ function ExamTimeTable() {
     );
     filtered = filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
     setFilteredExams(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleInputChange = (e) => {
@@ -186,6 +189,29 @@ function ExamTimeTable() {
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
+  // Pagination functions
+  const getPaginatedExams = () => {
+    const startIndex = (currentPage - 1) * EXAMS_PER_PAGE;
+    const endIndex = startIndex + EXAMS_PER_PAGE;
+    return filteredExams.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = () => {
+    return Math.ceil(filteredExams.length / EXAMS_PER_PAGE);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < getTotalPages()) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <PageLayout title="📅 Examination Time Table" subtitle="Manage Exam Schedule">
       <div className="admin-content">
@@ -197,9 +223,6 @@ function ExamTimeTable() {
 
         <div className="header-section">
           <h2>Exam Schedule</h2>
-          <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : '+ Add Exam to Timetable'}
-          </button>
         </div>
 
         {showForm && (
@@ -486,7 +509,7 @@ function ExamTimeTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredExams.map((exam) => (
+                  {getPaginatedExams().map((exam) => (
                     <tr key={exam._id}>
                       <td>{formatDate(exam.date)}</td>
                       <td>{exam.startTime} - {exam.endTime}</td>
@@ -518,6 +541,34 @@ function ExamTimeTable() {
               </table>
             </div>
           )}
+
+          {filteredExams.length > 0 && (
+            <div className="pagination-controls">
+              <button 
+                className="btn-pagination" 
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+              >
+                ← Previous
+              </button>
+              <span className="pagination-info">
+                Page {currentPage} of {getTotalPages()} (Total: {filteredExams.length} exams)
+              </span>
+              <button 
+                className="btn-pagination" 
+                onClick={handleNextPage}
+                disabled={currentPage === getTotalPages()}
+              >
+                Next →
+              </button>
+            </div>
+          )}
+
+          <div className="add-button-section">
+            <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
+              {showForm ? 'Cancel' : '+ Add Exam to Timetable'}
+            </button>
+          </div>
         </div>
       </div>
     </PageLayout>

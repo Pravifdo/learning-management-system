@@ -41,16 +41,7 @@ function Login() {
   };
 
   return (
-    <>
-      <nav className="auth-navbar">
-        <div className="auth-navbar-left">
-          <h1>📚 LMS</h1>
-        </div>
-        <div className="auth-navbar-right">
-          <p>Learning Management System</p>
-        </div>
-      </nav>
-      <div className="login-container">
+    <div className="login-container">
       <div className="login-box">
         <h1>LMS Login</h1>
         <form onSubmit={handleSubmit}>
@@ -89,8 +80,7 @@ function Login() {
           <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
         </div>
       </div>
-      </div>
-    </>
+    </div>
   );
 }
 
