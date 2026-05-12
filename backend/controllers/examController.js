@@ -45,7 +45,8 @@ export const createExam = async (req, res) => {
   try {
     const { title, subject, code, date, startTime, endTime, totalMarks, duration, description, status, topic, year, semester } = req.body;
 
-    if (!title || !subject || !code || !date || !startTime || !endTime || !totalMarks || !duration || !topic || !year || !semester) {
+    // Validate required fields (topic is optional now)
+    if (!title || !subject || !code || !date || !startTime || !endTime || !totalMarks || !duration || !year || !semester) {
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields',
@@ -59,11 +60,11 @@ export const createExam = async (req, res) => {
       date,
       startTime,
       endTime,
-      totalMarks,
-      duration,
+      totalMarks: Number(totalMarks), // Convert to number
+      duration: Number(duration),     // Convert to number
       description,
-      topic,
-      year,
+      topic: topic || 'General',      // Default to 'General' if empty
+      year: Number(year),
       semester,
       status: status || 'Scheduled',
     });
@@ -98,12 +99,12 @@ export const updateExam = async (req, res) => {
         date,
         startTime,
         endTime,
-        totalMarks,
-        duration,
+        totalMarks: Number(totalMarks),  // Convert to number
+        duration: Number(duration),      // Convert to number
         description,
         status,
-        topic,
-        year,
+        topic: topic || 'General',       // Default to 'General' if empty
+        year: Number(year),
         semester,
       },
       { new: true, runValidators: true }

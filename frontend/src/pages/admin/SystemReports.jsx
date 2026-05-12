@@ -18,7 +18,7 @@ function SystemReports() {
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState('overview');
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = 'http://localhost:4000/api';
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -180,7 +180,7 @@ function SystemReports() {
                     <div className="system-info">
                       <p><strong>Application:</strong> Learning Management System (LMS)</p>
                       <p><strong>Version:</strong> 1.0.0</p>
-                      <p><strong>Backend URL:</strong> http://localhost:5000</p>
+                      <p><strong>Backend URL:</strong> http://localhost:4000</p>
                       <p><strong>Frontend URL:</strong> http://localhost:5173</p>
                       <p><strong>Database:</strong> MongoDB</p>
                       <p><strong>Authentication:</strong> JWT Token Based</p>

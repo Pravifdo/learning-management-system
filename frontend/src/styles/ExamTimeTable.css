@@ -775,6 +775,20 @@
   display: none;
 }
 
+.required-fields-notice {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  padding: 12px 15px;
+  border-radius: 6px;
+  border-left: 4px solid #f59e0b;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .editable-table-wrapper {
   overflow-x: auto;
   margin-bottom: 15px;
@@ -962,6 +976,33 @@
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
 }
 
+.btn-submit-all {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-submit-all:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-submit-all:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+}
+
 .row-count {
   font-size: 14px;
   font-weight: 600;
@@ -1021,6 +1062,11 @@
     font-size: 12px;
   }
 
+  .btn-add-row, .btn-submit-all {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
   .editable-table-controls {
     flex-direction: column;
     gap: 10px;
@@ -1031,12 +1077,23 @@
     width: 100%;
     justify-content: center;
   }
+
+  .required-fields-notice {
+    font-size: 13px;
+    padding: 10px 12px;
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 480px) {
   .editable-table-container {
     padding: 10px;
     margin-bottom: 20px;
+  }
+
+  .required-fields-notice {
+    font-size: 12px;
+    padding: 8px 10px;
   }
 
   .editable-table-container h3 {

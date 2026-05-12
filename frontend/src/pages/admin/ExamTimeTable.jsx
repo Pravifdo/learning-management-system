@@ -36,7 +36,7 @@ function ExamTimeTable() {
     status: 'Scheduled',
   });
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = 'http://localhost:4000/api';
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -351,9 +351,9 @@ function ExamTimeTable() {
   const saveTableRow = async (index) => {
     const row = editableRows[index];
 
-    // Validation
-    if (!row.title || !row.code || !row.date || !row.startTime) {
-      showNotification('Please fill in all required fields (Title, Code, Date, Start Time)', 'error');
+    // Validation - ALL fields required
+    if (!row.title || !row.code || !row.date || !row.startTime || !row.subject || !row.endTime || !row.duration) {
+      showNotification('Please fill ALL fields: Title, Subject, Code, Date, Start Time, End Time, Duration', 'error');
       return;
     }
 
@@ -371,13 +371,13 @@ function ExamTimeTable() {
         date: row.date,
         startTime: row.startTime,
         endTime: row.endTime,
-        duration: row.duration,
+        duration: row.duration.toString(),  // Send as string
         year: parseInt(selectedYear),
         semester: selectedSemester,
         status: 'Scheduled',
         description: '',
         topic: '',
-        totalMarks: '',
+        totalMarks: '100',  // Send as string like sample data
       };
 
       const method = row._id ? 'PUT' : 'POST';
@@ -410,6 +410,98 @@ function ExamTimeTable() {
       const updatedRows = [...editableRows];
       updatedRows[index] = { ...row, isSaving: false };
       setEditableRows(updatedRows);
+    }
+  };
+
+  const saveAllRows = async () => {
+    if (editableRows.length === 0) {
+      showNotification('No rows to save', 'error');
+      return;
+    }
+
+    let successCount = 0;
+    let failedRows = [];
+
+    for (let index = 0; index < editableRows.length; index++) {
+      const row = editableRows[index];
+
+      // Validation - check ALL required fields including optional ones
+      if (!row.title || !row.code || !row.date || !row.startTime || !row.subject || !row.endTime || !row.duration) {
+        console.warn(`Row ${index + 1} validation failed:`, {
+          title: row.title || '❌ MISSING',
+          code: row.code || '❌ MISSING',
+          date: row.date || '❌ MISSING',
+          startTime: row.startTime || '❌ MISSING',
+          subject: row.subject || '❌ MISSING',
+          endTime: row.endTime || '❌ MISSING',
+          duration: row.duration || '❌ MISSING',
+        });
+        failedRows.push(row);
+        continue;
+      }
+
+      try {
+        // Prepare data with year/semester/status from filters or defaults
+        const examData = {
+          title: row.title,
+          subject: row.subject,
+          code: row.code,
+          date: row.date,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          duration: row.duration.toString(),  // Send as string
+          year: parseInt(selectedYear),
+          semester: selectedSemester,
+          status: 'Scheduled',
+          description: '',
+          topic: '',
+          totalMarks: '100',  // Send as string like sample data
+        };
+
+        const method = row._id ? 'PUT' : 'POST';
+        const url = row._id ? `${API_BASE_URL}/exams/${row._id}` : `${API_BASE_URL}/exams`;
+
+        console.log(`Row ${index + 1} sending data:`, examData);
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(examData),
+        });
+
+        if (response.ok) {
+          successCount++;
+          console.log(`Row ${index + 1} saved successfully`);
+        } else {
+          const errorData = await response.json();
+          console.error(`Row ${index + 1} API error:`, {
+            status: response.status,
+            message: errorData.message || 'Unknown error',
+          });
+          failedRows.push(row);
+        }
+      } catch (error) {
+        console.error(`Row ${index + 1} error:`, error);
+        failedRows.push(row);
+      }
+    }
+
+    // Show final notification and update state
+    if (successCount > 0) {
+      setEditableRows(failedRows);
+      fetchExams();
+      
+      if (failedRows.length === 0) {
+        showNotification(`✅ All ${successCount} exam(s) saved successfully!`, 'success');
+      } else {
+        showNotification(`⚠️ ${successCount} saved successfully, ${failedRows.length} failed. Fill all fields: Title, Code, Date, Start Time, Subject, End Time, Duration.`, 'error');
+      }
+    } else {
+      showNotification(`❌ All exams failed to save. Fill ALL fields: Title, Subject, Code, Date, Start Time, End Time, Duration.`, 'error');
+      console.error('All rows failed. Check console above for details.');
     }
   };
 
@@ -498,6 +590,9 @@ function ExamTimeTable() {
 
           {showForm && (
             <div className="editable-table-container">
+            <div className="required-fields-notice">
+              ⚠️ <strong>All fields are required:</strong> Title • Subject • Code • Date • Start Time • End Time • Duration
+            </div>
             <div className="editable-table-wrapper">
               <table className="editable-input-table">
                 <thead>
@@ -611,7 +706,12 @@ function ExamTimeTable() {
                 ➕ Add Row
               </button>
               {editableRows.length > 0 && (
-                <span className="row-count">{editableRows.length} row(s) ready to save</span>
+                <>
+                  <button className="btn-submit-all" onClick={saveAllRows} title="Save all rows to database">
+                    ✅ Submit All
+                  </button>
+                  <span className="row-count">{editableRows.length} row(s) ready to save</span>
+                </>
               )}
             </div>
           </div>

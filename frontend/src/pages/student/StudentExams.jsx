@@ -12,7 +12,7 @@ function StudentExams() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = 'http://localhost:4000/api';
   const token = localStorage.getItem('token');
 
   useEffect(() => {
