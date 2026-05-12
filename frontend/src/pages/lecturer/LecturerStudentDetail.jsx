@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/LecturerStudents.css';
 
 function LecturerStudents() {
-  const { logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,26 +39,8 @@ function LecturerStudents() {
     student.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
-    <div className="lecturer-students-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>📚 Students</h1>
-        </div>
-        <div className="navbar-right">
-          <button onClick={() => navigate('/lecturer')} className="back-btn">
-            ← Back to Dashboard
-          </button>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
-        </div>
-      </nav>
-
-      <div className="students-content">
+    <PageLayout title="👥 Students" subtitle="View and Manage Students">
         <div className="search-section">
           <input
             type="text"
@@ -110,8 +93,7 @@ function LecturerStudents() {
             </table>
           </div>
         )}
-      </div>
-    </div>
+    </PageLayout>
   );
 }
 

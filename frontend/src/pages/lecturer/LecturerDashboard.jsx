@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/LecturerDashboard.css';
 
 function LecturerDashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [lecturer, setLecturer] = useState(null);
   const [showProfileForm, setShowProfileForm] = useState(false);
@@ -65,127 +66,110 @@ function LecturerDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
-    <div className="lecturer-dashboard-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>📚 Lecturer Dashboard</h1>
+    <PageLayout title="📚 Lecturer Dashboard" subtitle="Welcome to Your Dashboard">
+      {!lecturer ? (
+        <div className="setup-section">
+          <h2>Complete Your Profile</h2>
+          <form onSubmit={handleCreateProfile} className="profile-form">
+            <div className="form-group">
+              <label>Subject *</label>
+              <input
+                type="text"
+                value={formData.subject}
+                onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                placeholder="e.g., Mathematics, Physics"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Department</label>
+              <input
+                type="text"
+                value={formData.department}
+                onChange={(e) => setFormData({...formData, department: e.target.value})}
+                placeholder="e.g., Science"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Office Location</label>
+              <input
+                type="text"
+                value={formData.officeLocation}
+                onChange={(e) => setFormData({...formData, officeLocation: e.target.value})}
+                placeholder="e.g., Building A, Room 301"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Office Hours</label>
+              <input
+                type="text"
+                value={formData.officeHours}
+                onChange={(e) => setFormData({...formData, officeHours: e.target.value})}
+                placeholder="e.g., Mon-Wed: 2-4 PM"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Bio</label>
+              <textarea
+                value={formData.bio}
+                onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                placeholder="Brief bio..."
+                rows="4"
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary">Create Profile</button>
+          </form>
         </div>
-        <div className="navbar-right">
-          <span className="user-name">{user?.fullName}</span>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
-        </div>
-      </nav>
-
-      <div className="lecturer-content">
-        {!lecturer ? (
-          <div className="setup-section">
-            <h2>Complete Your Profile</h2>
-            <form onSubmit={handleCreateProfile} className="profile-form">
-              <div className="form-group">
-                <label>Subject *</label>
-                <input
-                  type="text"
-                  value={formData.subject}
-                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                  placeholder="e.g., Mathematics, Physics"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Department</label>
-                <input
-                  type="text"
-                  value={formData.department}
-                  onChange={(e) => setFormData({...formData, department: e.target.value})}
-                  placeholder="e.g., Science"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Office Location</label>
-                <input
-                  type="text"
-                  value={formData.officeLocation}
-                  onChange={(e) => setFormData({...formData, officeLocation: e.target.value})}
-                  placeholder="e.g., Building A, Room 301"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Office Hours</label>
-                <input
-                  type="text"
-                  value={formData.officeHours}
-                  onChange={(e) => setFormData({...formData, officeHours: e.target.value})}
-                  placeholder="e.g., Mon-Wed: 2-4 PM"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Bio</label>
-                <textarea
-                  value={formData.bio}
-                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                  placeholder="Brief bio..."
-                  rows="4"
-                />
-              </div>
-
-              <button type="submit" className="btn-primary">Create Profile</button>
-            </form>
+      ) : (
+        <>
+          <div className="lecturer-profile-section">
+            <h2>Your Profile</h2>
+            <div className="profile-card">
+              <p><strong>Name:</strong> {user?.fullName}</p>
+              <p><strong>Email:</strong> {user?.email}</p>
+              <p><strong>Subject:</strong> {lecturer.subject}</p>
+              {lecturer.department && <p><strong>Department:</strong> {lecturer.department}</p>}
+              {lecturer.officeLocation && <p><strong>Office:</strong> {lecturer.officeLocation}</p>}
+              {lecturer.officeHours && <p><strong>Office Hours:</strong> {lecturer.officeHours}</p>}
+              {lecturer.bio && <p><strong>Bio:</strong> {lecturer.bio}</p>}
+            </div>
           </div>
-        ) : (
-          <>
-            <div className="lecturer-profile-section">
-              <h2>Your Profile</h2>
-              <div className="profile-card">
-                <p><strong>Name:</strong> {user?.fullName}</p>
-                <p><strong>Email:</strong> {user?.email}</p>
-                <p><strong>Subject:</strong> {lecturer.subject}</p>
-                {lecturer.department && <p><strong>Department:</strong> {lecturer.department}</p>}
-                {lecturer.officeLocation && <p><strong>Office:</strong> {lecturer.officeLocation}</p>}
-                {lecturer.officeHours && <p><strong>Office Hours:</strong> {lecturer.officeHours}</p>}
-                {lecturer.bio && <p><strong>Bio:</strong> {lecturer.bio}</p>}
-              </div>
-            </div>
 
-            <div className="lecturer-actions">
-              <h2>Actions</h2>
-              <div className="action-cards">
-                <div 
-                  className="action-card"
-                  onClick={() => navigate('/lecturer/students')}
-                >
-                  <h3>👥 View All Students</h3>
-                  <p>See and manage all students</p>
-                </div>
-                <div 
-                  className="action-card"
-                  onClick={() => navigate('/lecturer/upload')}
-                >
-                  <h3>📤 Upload Content</h3>
-                  <p>Upload lecture notes & assignments</p>
-                </div>
-                <div 
-                  className="action-card"
-                  onClick={() => navigate('/lecturer/uploads')}
-                >
-                  <h3>📚 My Uploads</h3>
-                  <p>View & manage your uploaded content</p>
-                </div>
+          <div className="lecturer-actions">
+            <h2>Actions</h2>
+            <div className="action-cards">
+              <div 
+                className="action-card"
+                onClick={() => navigate('/lecturer/students')}
+              >
+                <h3>👥 View All Students</h3>
+                <p>See and manage all students</p>
+              </div>
+              <div 
+                className="action-card"
+                onClick={() => navigate('/lecturer/upload')}
+              >
+                <h3>📤 Upload Content</h3>
+                <p>Upload lecture notes & assignments</p>
+              </div>
+              <div
+                className="action-card"
+                onClick={() => navigate('/lecturer/uploads')}
+              >
+                <h3>📚 My Uploads</h3>
+                <p>View & manage your uploaded content</p>
               </div>
             </div>
-          </>
-        )}
-      </div>
-    </div>
+          </div>
+        </>
+      )}
+    </PageLayout>
   );
 }
 

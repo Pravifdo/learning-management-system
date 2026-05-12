@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/StudentAccount.css';
 
 function StudentAccount() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
