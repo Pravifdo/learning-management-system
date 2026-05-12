@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/MyCourses.css';
 
 function MyCourses() {
   const [lecturers, setLecturers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchLecturers();
@@ -38,40 +39,12 @@ function MyCourses() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
 
   return (
-    <div className="my-courses-container">
-
-      {/* Navbar */}
-      <nav className="navbar">
-
-        {/* Back Button */}
-        <button 
-          className="back-btn"
-          onClick={() => navigate('/dashboard')}
-        >
-          ← Back to Dashboard
-        </button>
-
-        <h1>Lecturers</h1>
-
-        {/* Logout */}
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
-        </button>
-
-      </nav>
-
-      {/* Content */}
-      <div className="courses-content">
+    <PageLayout title="📚 My Lecturers" subtitle="View All Available Lecturers">
 
         {lecturers.length > 0 ? (
           <div className="courses-grid">
@@ -105,9 +78,7 @@ function MyCourses() {
           <p className="no-courses">No lecturers found</p>
         )}
 
-      </div>
-
-    </div>
+      </PageLayout>
   );
 }
 

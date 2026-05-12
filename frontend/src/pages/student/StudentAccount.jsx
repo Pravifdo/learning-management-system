@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/PageLayout';
 import '../../styles/StudentAccount.css';
 
@@ -33,28 +32,10 @@ function StudentAccount() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="student-account-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>📋 My Account</h1>
-        </div>
-        <div className="navbar-right">
-          <button onClick={() => navigate('/dashboard')} className="back-btn">
-            ← Back to Dashboard
-          </button>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
-        </div>
-      </nav>
-
-      <div className="account-content">
+    <PageLayout title="📋 My Account" subtitle="View Your Account Details">
         {/* Personal Information */}
         <div className="info-card">
           <h2>Personal Information</h2>
@@ -149,8 +130,7 @@ function StudentAccount() {
           <p><strong>Account Created:</strong> {studentData?.createdAt ? new Date(studentData.createdAt).toLocaleDateString() : '-'}</p>
           <p><strong>Last Updated:</strong> {studentData?.updatedAt ? new Date(studentData.updatedAt).toLocaleDateString() : '-'}</p>
         </div>
-      </div>
-    </div>
+    </PageLayout>
   );
 }
 

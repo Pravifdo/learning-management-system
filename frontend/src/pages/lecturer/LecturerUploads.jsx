@@ -65,31 +65,13 @@ function LecturerUploads() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   const filteredUploads = uploads.filter(upload => {
     if (filter === 'all') return true;
     return upload.type === filter;
   });
 
   return (
-    <div className="lecturer-uploads-container">
-      {/* Navbar */}
-      <nav className="navbar">
-        <h1>📚 My Uploads</h1>
-        <div>
-          <button onClick={() => navigate('/lecturer/upload')} className="upload-btn-nav">
-            ➕ New Upload
-          </button>
-          <button onClick={() => navigate('/lecturer')}>← Dashboard</button>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </nav>
-
-      {/* Content */}
+    <PageLayout title="📚 My Uploads" subtitle="View Your Course Materials">
       <div className="uploads-content">
         {/* Message */}
         {message && (
@@ -186,7 +168,7 @@ function LecturerUploads() {
           </div>
         )}
       </div>
-    </div>
+    </PageLayout>
   );
 }
 

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/SystemReports.css';
 
 function SystemReports() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -59,31 +60,9 @@ function SystemReports() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
-    <div className="system-reports-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>📊 System Reports</h1>
-        </div>
-        <div className="navbar-right">
-          <span className="user-name">{user?.fullName}</span>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
-        </div>
-      </nav>
-
+    <PageLayout title="📊 System Reports" subtitle="System Analytics & Reports">
       <div className="admin-content">
-        <div className="header-section">
-          <h2>System Analytics & Reports</h2>
-          <button className="btn-primary" onClick={fetchStats}>
-            🔄 Refresh Data
-          </button>
-        </div>
-
         {loading ? (
           <div className="loading">Loading reports...</div>
         ) : (
@@ -214,7 +193,7 @@ function SystemReports() {
           </>
         )}
       </div>
-    </div>
+    </PageLayout>
   );
 }
 

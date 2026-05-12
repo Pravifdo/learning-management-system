@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/Settings.css';
 
 function Settings() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -47,31 +48,8 @@ function Settings() {
     }, 3000);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
-    <div className="settings-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>System Settings</h1>
-          <div className="nav-links">
-            <button className="nav-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
-            <button className="nav-btn" onClick={() => navigate('/admin/users')}>Users</button>
-            <button className="nav-btn" onClick={() => navigate('/admin/courses')}>Courses</button>
-            <button className="nav-btn" onClick={() => navigate('/admin/exams')}>Exams</button>
-            <button className="nav-btn" onClick={() => navigate('/admin/reports')}>Reports</button>
-            <button className="nav-btn active" onClick={() => navigate('/admin/settings')}>Settings</button>
-          </div>
-        </div>
-        <div className="navbar-right">
-          <span className="user-name">{user?.fullName}</span>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
-        </div>
-      </nav>
-
+    <PageLayout title="⚙️ System Settings" subtitle="Configure System Settings">
       {message && (
         <div className={`notification notification-${messageType}`}>
           {message}
@@ -208,7 +186,7 @@ function Settings() {
           </div>
         </form>
       </div>
-    </div>
+    </PageLayout>
   );
 }
 

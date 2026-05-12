@@ -77,19 +77,9 @@ function StudentExams() {
   };
 
   return (
-    <div className="student-exams-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>� Exam Topics Timetable</h1>
-        </div>
-        <div className="navbar-right">
-          <span className="user-name">{user?.fullName}</span>
-        </div>
-      </nav>
-
+    <PageLayout title="✏️ Exam Schedule" subtitle="View Your Exam Topics & Schedule">
       <div className="exams-content">
         <div className="exams-header">
-          <h2>📚 Your Exam Topics & Schedule</h2>
           <div className="filter-controls">
             <label>Filter by Status: </label>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
@@ -231,7 +221,7 @@ function StudentExams() {
           </div>
         )}
       </div>
-    </div>
+    </PageLayout>
   );
 }
 

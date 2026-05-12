@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/CourseUploads.css';
 
 function CourseUploads() {
   const { subject } = useParams();
-  const { logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [uploads, setUploads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,34 +43,13 @@ function CourseUploads() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   const filteredUploads = uploads.filter(upload => {
     if (filter === 'all') return true;
     return upload.type === filter;
   });
 
   return (
-    <div className="course-uploads-container">
-      {/* Navbar */}
-      <nav className="navbar">
-        <div className="nav-left">
-          <h1>📚 {subject}</h1>
-          <p className="course-subtitle">Course Materials & Assignments</p>
-        </div>
-        <div className="nav-right">
-          <button onClick={() => navigate('/student/courses')} className="back-btn">
-            ← Back to Courses
-          </button>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </nav>
-
-      {/* Content */}
-      <div className="uploads-content">
+    <PageLayout title={`📚 ${subject}`} subtitle="Course Materials & Assignments">
         {/* Message */}
         {message && (
           <div className={`message ${message.includes('✅') ? 'success' : 'error'}`}>
@@ -161,8 +141,7 @@ function CourseUploads() {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </PageLayout>
   );
 }
 

@@ -110,25 +110,8 @@ function LecturerUpload() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
-    <div className="lecturer-upload-container">
-      {/* Navbar */}
-      <nav className="navbar">
-        <h1>📤 Lecturer Upload Panel</h1>
-        <div>
-          <button onClick={() => navigate('/lecturer/uploads')}>📚 View My Uploads</button>
-          <button onClick={() => navigate('/lecturer')}>← Dashboard</button>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </nav>
-
-      {/* Content */}
-      <div className="upload-content">
+    <PageLayout title="📤 Lecturer Upload Panel" subtitle="Upload Course Materials">
 
         {/* Add Buttons */}
         <div className="add-buttons">
@@ -222,8 +205,7 @@ function LecturerUpload() {
           {loading ? 'Uploading...' : '📤 Upload All'}
         </button>
 
-      </div>
-    </div>
+    </PageLayout>
   );
 }
 

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/StudentDetail.css';
 
 function StudentDetail() {
   const { studentId } = useParams();
-  const { logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -93,29 +94,11 @@ function StudentDetail() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   if (loading) return <p>Loading...</p>;
   if (!student) return <p>Student not found</p>;
 
   return (
-    <div className="student-detail-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>📝 Student Details</h1>
-        </div>
-        <div className="navbar-right">
-          <button onClick={() => navigate('/lecturer/students')} className="back-btn">
-            ← Back to Students
-          </button>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
-        </div>
-      </nav>
-
-      <div className="detail-content">
+    <PageLayout title="📝 Student Details" subtitle="View and Update Student Records">
         <div className="student-info-card">
           <h2>Student Information</h2>
           <div className="info-grid">
@@ -199,8 +182,7 @@ function StudentDetail() {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </PageLayout>
   );
 }
 

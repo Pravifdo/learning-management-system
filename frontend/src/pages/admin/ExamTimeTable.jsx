@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import PageLayout from '../../components/PageLayout';
 import '../../styles/ExamTimeTable.css';
 
 function ExamTimeTable() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
@@ -180,28 +181,13 @@ function ExamTimeTable() {
     }, 3000);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   const formatDate = (dateString) => {
     const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
   return (
-    <div className="exam-timetable-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>📅 Examination Time Table</h1>
-        </div>
-        <div className="navbar-right">
-          <span className="user-name">{user?.fullName}</span>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
-        </div>
-      </nav>
-
+    <PageLayout title="📅 Examination Time Table" subtitle="Manage Exam Schedule">
       <div className="admin-content">
         {message && (
           <div className={`notification notification-${messageType}`}>
@@ -534,7 +520,7 @@ function ExamTimeTable() {
           )}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
 

@@ -13,16 +13,16 @@ function PageLayout({ title, subtitle, children, showUserInfo = false, userDetai
 
   return (
     <div className="page-container">
-      {/* Header */}
-      <header className="page-header">
+      {/* Navbar - Same as Dashboard */}
+      <nav className="navbar">
         <div className="navbar-left">
           <h1>{title}</h1>
         </div>
-        <div className="page-header-right">
-          <span className="page-header-user">{user?.fullName}</span>
-          <button onClick={handleLogout} className="page-header-btn">Logout</button>
+        <div className="navbar-right">
+          <span className="user-name">{user?.fullName}</span>
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>
-      </header>
+      </nav>
 
       {/* Page Content */}
       <div className="page-content">

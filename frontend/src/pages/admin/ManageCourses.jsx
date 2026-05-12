@@ -170,23 +170,8 @@ function ManageCourses() {
     }, 3000);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
-    <div className="manage-courses-container">
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1>📚 Manage Courses</h1>
-        </div>
-        <div className="navbar-right">
-          <span className="user-name">{user?.fullName}</span>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
-        </div>
-      </nav>
-
+    <PageLayout title="📚 Manage Courses" subtitle="Create, Edit, and Delete Courses">
       <div className="admin-content">
         {message && (
           <div className={`notification notification-${messageType}`}>
@@ -409,7 +394,7 @@ function ManageCourses() {
           )}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
 
