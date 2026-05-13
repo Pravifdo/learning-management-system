@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import PageLayout from '../../components/PageLayout';
 import '../../styles/StudentAccount.css';
@@ -109,6 +110,17 @@ function StudentAccount() {
           <h2>📚 My Courses</h2>
           <p>View all your enrolled courses and course materials</p>
           <button className="view-courses-btn">View Courses →</button>
+        </div>
+
+        {/* My Results Box */}
+        <div 
+          className="info-card my-results-box"
+          onClick={() => navigate('/student/results')}
+          style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}
+        >
+          <h2 style={{ color: 'white' }}>📊 My Exam Results</h2>
+          <p style={{ color: 'rgba(255,255,255,0.9)' }}>View your official exam marks and academic performance</p>
+          <button className="view-courses-btn" style={{ background: 'white', color: '#764ba2' }}>View My Results →</button>
         </div>
 
         {/* Enrolled Courses */}

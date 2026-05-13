@@ -9,6 +9,7 @@ import LecturerStudentDetail from './pages/lecturer/LecturerStudentDetail';
 import StudentDetail from './pages/student/StudentDetail';
 import StudentAccount from './pages/student/StudentAccount';
 import StudentExams from './pages/student/StudentExams';
+import StudentResults from './pages/student/StudentResults';
 import LecturerUpload from './pages/lecturer/LecturerUpload';
 import LecturerUploads from './pages/lecturer/LecturerUploads';
 import CourseUploads from './pages/student/CourseUploads';
@@ -132,6 +133,10 @@ function AppRoutes() {
       <Route
         path="/student/exams"
         element={<RoleRoute element={<StudentExams />} allowedRole="student" />}
+      />
+      <Route
+        path="/student/results"
+        element={<RoleRoute element={<StudentResults />} allowedRole="student" />}
       />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

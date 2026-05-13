@@ -111,6 +111,52 @@
   font-size: 1.1rem;
 }
 
+.exams-groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.exam-group-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #3498db;
+}
+
+.group-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.group-header h3::before {
+  content: '📅';
+  font-size: 1.2rem;
+}
+
+.exam-count-badge {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .exams-table-wrapper {
   background: white;
   border-radius: 8px;

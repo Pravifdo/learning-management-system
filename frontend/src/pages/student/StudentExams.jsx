@@ -57,14 +57,37 @@ function StudentExams() {
     setSelectedExam(null);
   };
 
-  const getFilteredExams = () => {
-    if (filterStatus === 'all') {
-      return exams;
-    }
-    return exams.filter(exam => exam.status === filterStatus);
+  const getGroupedExams = () => {
+    const grouped = {};
+    const examsToGroup = filterStatus === 'all' 
+      ? exams 
+      : exams.filter(exam => exam.status === filterStatus);
+
+    examsToGroup.forEach(exam => {
+      const year = exam.year || 'N/A';
+      const semester = exam.semester || 'N/A';
+      const key = `Year ${year} - Semester ${semester}`;
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(exam);
+    });
+
+    // Sort keys: Year descending, then Semester ascending
+    return Object.keys(grouped)
+      .sort((a, b) => {
+        // Simple string comparison works if format is consistent, 
+        // but better to parse if possible. For now, alphabetical is okay 
+        // as "Year 2026" comes after "Year 2025".
+        return b.localeCompare(a); 
+      })
+      .reduce((acc, key) => {
+        acc[key] = grouped[key];
+        return acc;
+      }, {});
   };
 
-  const filteredExams = getFilteredExams();
+  const groupedExams = getGroupedExams();
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -94,59 +117,65 @@ function StudentExams() {
         {loading && <div className="loading">Loading exam schedule...</div>}
         {error && <div className="error-message">⚠️ {error}</div>}
 
-        {!loading && !error && filteredExams.length === 0 && (
+        {!loading && !error && Object.keys(groupedExams).length === 0 && (
           <div className="no-exams">
             <p>No exams found for your courses.</p>
           </div>
         )}
 
-        {!loading && !error && filteredExams.length > 0 && (
-          <div className="exams-table-wrapper">
-            <table className="exams-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Subject</th>
-                  <th>Exam Code</th>
-                  <th>Title</th>
-                  <th>Topic</th>
-                  <th>Year</th>
-                  <th>Semester</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Duration</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredExams.map((exam) => (
-                  <tr key={exam._id} className={`exam-row status-${exam.status}`}>
-                    <td className="date-cell">{formatDate(exam.date)}</td>
-                    <td className="subject-cell">{exam.subject}</td>
-                    <td className="code-cell"><span className="code-badge">{exam.code}</span></td>
-                    <td className="title-cell">{exam.title}</td>
-                    <td className="topic-cell">{exam.topic || 'N/A'}</td>
-                    <td className="year-cell">{exam.year || 'N/A'}</td>
-                    <td className="semester-cell">{exam.semester || 'N/A'}</td>
-                    <td className="time-cell">{formatTime(exam.startTime)}</td>
-                    <td className="time-cell">{formatTime(exam.endTime)}</td>
-                    <td className="duration-cell">{exam.duration} mins</td>
-                    <td className={`status-cell status-${exam.status}`}>
-                      <span className="status-badge">{exam.status}</span>
-                    </td>
-                    <td className="action-cell">
-                      <button
-                        className="view-btn"
-                        onClick={() => handleViewDetails(exam)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {!loading && !error && Object.keys(groupedExams).length > 0 && (
+          <div className="exams-groups-container">
+            {Object.entries(groupedExams).map(([groupKey, examsInGroup]) => (
+              <div key={groupKey} className="exam-group-section">
+                <div className="group-header">
+                  <h3>{groupKey}</h3>
+                  <span className="exam-count-badge">{examsInGroup.length} Exams</span>
+                </div>
+                <div className="exams-table-wrapper">
+                  <table className="exams-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Exam Code</th>
+                        <th>Title</th>
+                        <th>Topic</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {examsInGroup.map((exam) => (
+                        <tr key={exam._id} className={`exam-row status-${exam.status}`}>
+                          <td className="date-cell">{formatDate(exam.date)}</td>
+                          <td className="subject-cell">{exam.subject}</td>
+                          <td className="code-cell"><span className="code-badge">{exam.code}</span></td>
+                          <td className="title-cell">{exam.title}</td>
+                          <td className="topic-cell">{exam.topic || 'N/A'}</td>
+                          <td className="time-cell">{formatTime(exam.startTime)}</td>
+                          <td className="time-cell">{formatTime(exam.endTime)}</td>
+                          <td className="duration-cell">{exam.duration} mins</td>
+                          <td className={`status-cell status-${exam.status}`}>
+                            <span className="status-badge">{exam.status}</span>
+                          </td>
+                          <td className="action-cell">
+                            <button
+                              className="view-btn"
+                              onClick={() => handleViewDetails(exam)}
+                            >
+                              View Details
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

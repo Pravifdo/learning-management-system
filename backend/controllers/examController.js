@@ -248,37 +248,47 @@ export const uploadExamResults = async (req, res) => {
         else grade = 'F';
 
         // Check if result already exists for this student and exam
+        const email = row['Student Email'] || row['Email'];
+        const studentName = row['Student Name'] || row['Name'] || 'Unknown';
+        const indexNo = row['Index Number'] || row['Index No'] || '';
+
+        if (!email) {
+          errors.push(`Row ${i + 2}: Student Email is required`);
+          continue;
+        }
+
         const existingResult = await Result.findOne({
           examId,
-          studentEmail: row['Student Email'].toLowerCase(),
+          studentEmail: email.toLowerCase(),
         });
+
+        const resultData = {
+          marksObtained,
+          totalMarks,
+          percentage: Math.round(percentage * 100) / 100,
+          grade,
+          remarks: row['Remarks'] || '',
+          indexNo,
+          year: exam.year,
+          semester: exam.semester,
+          studentName,
+          uploadedAt: new Date(),
+        };
 
         let result;
         if (existingResult) {
           // Update existing result
           result = await Result.findByIdAndUpdate(
             existingResult._id,
-            {
-              marksObtained,
-              totalMarks,
-              percentage: Math.round(percentage * 100) / 100,
-              grade,
-              remarks: row['Remarks'] || '',
-              uploadedAt: new Date(),
-            },
+            resultData,
             { new: true }
           );
         } else {
           // Create new result
           result = new Result({
             examId,
-            studentEmail: row['Student Email'].toLowerCase(),
-            studentName: row['Student Name'] || 'Unknown',
-            marksObtained,
-            totalMarks,
-            percentage: Math.round(percentage * 100) / 100,
-            grade,
-            remarks: row['Remarks'] || '',
+            studentEmail: email.toLowerCase(),
+            ...resultData
           });
           await result.save();
         }
@@ -318,7 +328,144 @@ export const getExamResults = async (req, res) => {
       });
     }
 
-    const results = await Result.find({ examId }).populate('examId', 'title subject');
+    const results = await Result.find({ examId }).populate('examId', 'title subject code totalMarks');
+
+    res.status(200).json({
+      success: true,
+      data: results,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Get all results with optional filters (year, semester)
+export const getAllResults = async (req, res) => {
+  try {
+    const { year, semester } = req.query;
+    
+    let examFilter = {};
+    if (year) examFilter.year = Number(year);
+    if (semester) examFilter.semester = semester;
+
+    // Find exams that match the filters
+    const exams = await Exam.find(examFilter);
+    const examIds = exams.map(e => e._id);
+
+    // Find results for those exams
+    const results = await Result.find({ examId: { $in: examIds } })
+      .populate('examId', 'title subject code year semester')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: results,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Download all results for a specific year and semester as Excel
+export const downloadAllResults = async (req, res) => {
+  try {
+    const { year, semester } = req.query;
+
+    if (!year || !semester) {
+      return res.status(400).json({
+        success: false,
+        message: 'Year and Semester are required',
+      });
+    }
+
+    // Find exams for this year/semester
+    const exams = await Exam.find({ year: Number(year), semester });
+    const examIds = exams.map(e => e._id);
+
+    // Find all results
+    const results = await Result.find({ examId: { $in: examIds } })
+      .populate('examId', 'title subject code');
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No results found for the selected year and semester',
+      });
+    }
+
+    // Format data for Excel
+    const excelData = results.map(res => ({
+      'Year': res.year,
+      'Semester': res.semester,
+      'Student Name': res.studentName,
+      'Index Number': res.indexNo,
+      'Email': res.studentEmail,
+      'Exam Code': res.examId?.code || 'N/A',
+      'Subject': res.examId?.subject || 'N/A',
+      'Exam Title': res.examId?.title || 'N/A',
+      'Marks Obtained': res.marksObtained,
+      'Total Marks': res.totalMarks,
+      'Percentage (%)': res.percentage,
+      'Grade': res.grade,
+      'Remarks': res.remarks || '',
+    }));
+
+    // Create workbook
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    
+    // Set column widths
+    const wscols = [
+      { wch: 8 },  // Year
+      { wch: 10 }, // Semester
+      { wch: 25 }, // Student Name
+      { wch: 15 }, // Index Number
+      { wch: 30 }, // Email
+      { wch: 15 }, // Exam Code
+      { wch: 20 }, // Subject
+      { wch: 30 }, // Exam Title
+      { wch: 15 }, // Marks
+      { wch: 15 }, // Total
+      { wch: 15 }, // %
+      { wch: 8 },  // Grade
+      { wch: 30 }, // Remarks
+    ];
+    worksheet['!cols'] = wscols;
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Master Report');
+
+    // Generate buffer
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    // Send as attachment
+    res.setHeader('Content-Disposition', `attachment; filename=Master_Results_${year}_Sem_${semester}.xlsx`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buffer);
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+// Get student's own results
+export const getMyResults = async (req, res) => {
+  try {
+    const email = req.user.email.toLowerCase();
+    
+    const results = await Result.find({ studentEmail: email })
+      .populate({
+        path: 'examId',
+        select: 'title subject code date totalMarks'
+      })
+      .sort({ uploadedAt: -1 });
 
     res.status(200).json({
       success: true,

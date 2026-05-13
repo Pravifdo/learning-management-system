@@ -10,7 +10,7 @@ const resultSchema = new mongoose.Schema(
     studentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Student',
-      required: true,
+      // Optional for flexibility in admin uploads
     },
     studentEmail: {
       type: String,
@@ -19,6 +19,9 @@ const resultSchema = new mongoose.Schema(
     studentName: {
       type: String,
       required: true,
+    },
+    indexNo: {
+      type: String,
     },
     marksObtained: {
       type: Number,
@@ -39,6 +42,12 @@ const resultSchema = new mongoose.Schema(
     remarks: {
       type: String,
     },
+    year: {
+      type: Number,
+    },
+    semester: {
+      type: String,
+    },
     uploadedAt: {
       type: Date,
       default: Date.now,
@@ -48,7 +57,9 @@ const resultSchema = new mongoose.Schema(
 );
 
 // Index for efficient queries
-resultSchema.index({ examId: 1, studentId: 1 }, { unique: true });
+// Removed unique constraint to allow multiple uploads if needed, 
+// or I can handle updates in the controller
+resultSchema.index({ examId: 1, studentEmail: 1 });
 
 const Result = mongoose.model('Result', resultSchema);
 
