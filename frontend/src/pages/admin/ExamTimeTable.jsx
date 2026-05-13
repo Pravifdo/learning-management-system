@@ -315,6 +315,20 @@ function ExamTimeTable() {
       ...updatedRows[index],
       [field]: value,
     };
+
+    // Auto-calculate duration if both start and end times are provided
+    if ((field === 'startTime' || field === 'endTime') && updatedRows[index].startTime && updatedRows[index].endTime) {
+      const [startHours, startMins] = updatedRows[index].startTime.split(':').map(Number);
+      const [endHours, endMins] = updatedRows[index].endTime.split(':').map(Number);
+      const startTotalMins = startHours * 60 + startMins;
+      const endTotalMins = endHours * 60 + endMins;
+      const calculatedDuration = endTotalMins - startTotalMins;
+      
+      if (calculatedDuration > 0) {
+        updatedRows[index].duration = calculatedDuration.toString();
+      }
+    }
+
     setEditableRows(updatedRows);
   };
 
@@ -425,17 +439,19 @@ function ExamTimeTable() {
     for (let index = 0; index < editableRows.length; index++) {
       const row = editableRows[index];
 
-      // Validation - check ALL required fields including optional ones
-      if (!row.title || !row.code || !row.date || !row.startTime || !row.subject || !row.endTime || !row.duration) {
-        console.warn(`Row ${index + 1} validation failed:`, {
-          title: row.title || '❌ MISSING',
-          code: row.code || '❌ MISSING',
-          date: row.date || '❌ MISSING',
-          startTime: row.startTime || '❌ MISSING',
-          subject: row.subject || '❌ MISSING',
-          endTime: row.endTime || '❌ MISSING',
-          duration: row.duration || '❌ MISSING',
-        });
+      // Validation - check required fields
+      const missingFields = [];
+      if (!row.title) missingFields.push('Title');
+      if (!row.code) missingFields.push('Code');
+      if (!row.date) missingFields.push('Date');
+      if (!row.startTime) missingFields.push('Start Time');
+      if (!row.subject) missingFields.push('Subject');
+      if (!row.endTime) missingFields.push('End Time');
+      if (!row.duration) missingFields.push('Duration');
+
+      if (missingFields.length > 0) {
+        console.warn(`Row ${index + 1} validation failed - Missing fields: ${missingFields.join(', ')}`);
+        showNotification(`Row ${index + 1} is missing: ${missingFields.join(', ')}`, 'error');
         failedRows.push(row);
         continue;
       }
@@ -497,11 +513,10 @@ function ExamTimeTable() {
       if (failedRows.length === 0) {
         showNotification(`✅ All ${successCount} exam(s) saved successfully!`, 'success');
       } else {
-        showNotification(`⚠️ ${successCount} saved successfully, ${failedRows.length} failed. Fill all fields: Title, Code, Date, Start Time, Subject, End Time, Duration.`, 'error');
+        showNotification(`⚠️ ${successCount} saved successfully, ${failedRows.length} failed. Fill ALL fields for failed rows.`, 'error');
       }
     } else {
-      showNotification(`❌ All exams failed to save. Fill ALL fields: Title, Subject, Code, Date, Start Time, End Time, Duration.`, 'error');
-      console.error('All rows failed. Check console above for details.');
+      showNotification(`❌ All ${editableRows.length} row(s) failed. Check console and fill all required fields.`, 'error');
     }
   };
 
