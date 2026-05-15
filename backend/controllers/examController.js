@@ -176,6 +176,7 @@ export const getExamsBySubject = async (req, res) => {
 };
 
 // Upload exam results from Excel file (admin only)
+// New format: Index Number | Subject Code 1 | Subject Code 2 | etc.
 export const uploadExamResults = async (req, res) => {
   try {
     if (!req.file) {
@@ -206,104 +207,113 @@ export const uploadExamResults = async (req, res) => {
     // Read Excel file
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = XLSX.utils.sheet_to_json(worksheet);
-
-    if (data.length === 0) {
+    
+    // Get all data including header row
+    const allData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+    if (allData.length < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Excel file is empty',
+        message: 'Excel file must contain headers and at least one data row',
+      });
+    }
+
+    const headers = allData[0];
+    const subjectCodes = headers.slice(1); // All columns except first (Index Number)
+    
+    if (!headers[0] || !subjectCodes.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid format: First column should be Index Number, followed by subject codes',
       });
     }
 
     const uploadedResults = [];
     const errors = [];
+    const validGrades = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'AB', 'W'];
 
-    // Process each row
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
+    // Process each data row (skip header)
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i];
       try {
-        // Validate required fields
-        if (!row['Student Email'] || row['Student Email'].trim() === '') {
-          errors.push(`Row ${i + 2}: Student Email is required`);
-          continue;
-        }
-        if (row['Marks Obtained'] === undefined || row['Marks Obtained'] === '') {
-          errors.push(`Row ${i + 2}: Marks Obtained is required`);
-          continue;
-        }
-
-        const marksObtained = parseFloat(row['Marks Obtained']);
-        const totalMarks = exam.totalMarks;
-        const percentage = (marksObtained / totalMarks) * 100;
-
-        // Calculate grade based on percentage
-        let grade;
-        if (percentage >= 90) grade = 'A+';
-        else if (percentage >= 80) grade = 'A';
-        else if (percentage >= 70) grade = 'B+';
-        else if (percentage >= 60) grade = 'B';
-        else if (percentage >= 50) grade = 'C+';
-        else if (percentage >= 40) grade = 'C';
-        else if (percentage >= 30) grade = 'D';
-        else grade = 'F';
-
-        // Check if result already exists for this student and exam
-        const email = row['Student Email'] || row['Email'];
-        const studentName = row['Student Name'] || row['Name'] || 'Unknown';
-        const indexNo = row['Index Number'] || row['Index No'] || '';
-
-        if (!email) {
-          errors.push(`Row ${i + 2}: Student Email is required`);
+        const indexNo = row[0];
+        
+        // Validate index number
+        if (!indexNo || indexNo.toString().trim() === '') {
+          errors.push(`Row ${i + 1}: Index Number is required`);
           continue;
         }
 
-        const existingResult = await Result.findOne({
-          examId,
-          studentEmail: email.toLowerCase(),
-        });
+        // Process each subject in this row
+        for (let j = 0; j < subjectCodes.length; j++) {
+          const subjectCode = subjectCodes[j];
+          const grade = row[j + 1];
 
-        const resultData = {
-          marksObtained,
-          totalMarks,
-          percentage: Math.round(percentage * 100) / 100,
-          grade,
-          remarks: row['Remarks'] || '',
-          indexNo,
-          year: exam.year,
-          semester: exam.semester,
-          studentName,
-          uploadedAt: new Date(),
-        };
+          // Skip empty grades
+          if (!grade || grade.toString().trim() === '') {
+            continue;
+          }
 
-        let result;
-        if (existingResult) {
-          // Update existing result
-          result = await Result.findByIdAndUpdate(
-            existingResult._id,
-            resultData,
-            { new: true }
-          );
-        } else {
-          // Create new result
-          result = new Result({
-            examId,
-            studentEmail: email.toLowerCase(),
-            ...resultData
+          const gradeStr = grade.toString().trim().toUpperCase();
+          
+          // Validate grade
+          if (!validGrades.includes(gradeStr)) {
+            errors.push(`Row ${i + 1}, Subject ${subjectCode}: Invalid grade "${grade}". Valid grades: A+, A, B+, B, C+, C, D, F, AB`);
+            continue;
+          }
+
+          // Check if result already exists for this student and subject
+          const existingResult = await Result.findOne({
+            indexNo: indexNo.toString().trim(),
+            subjectCode: subjectCode.toString().trim(),
+            examId
           });
-          await result.save();
-        }
 
-        uploadedResults.push(result);
+          const resultData = {
+            marksObtained: 0, // Not used in new format
+            totalMarks: 0, // Not used in new format
+            percentage: 0, // Not used in new format
+            grade: gradeStr,
+            indexNo: indexNo.toString().trim(),
+            subjectCode: subjectCode.toString().trim(),
+            year: exam.year,
+            semester: exam.semester,
+            studentName: '', // Will be empty, can be added later
+            studentEmail: '', // Will be empty for this format
+            uploadedAt: new Date(),
+          };
+
+          let result;
+          if (existingResult) {
+            // Update existing result
+            result = await Result.findByIdAndUpdate(
+              existingResult._id,
+              resultData,
+              { new: true }
+            );
+          } else {
+            // Create new result
+            result = new Result({
+              examId,
+              ...resultData
+            });
+            await result.save();
+          }
+
+          uploadedResults.push(result);
+        }
       } catch (error) {
-        errors.push(`Row ${i + 2}: ${error.message}`);
+        errors.push(`Row ${i + 1}: ${error.message}`);
       }
     }
 
     res.status(200).json({
       success: true,
-      message: `Results uploaded successfully. ${uploadedResults.length} records processed.`,
+      message: `Results uploaded successfully. ${uploadedResults.length} grades processed across ${allData.length - 1} students.`,
       data: {
         uploadedCount: uploadedResults.length,
+        studentsProcessed: allData.length - 1,
+        subjectsCount: subjectCodes.length,
         errorCount: errors.length,
         errors: errors.length > 0 ? errors : [],
       },

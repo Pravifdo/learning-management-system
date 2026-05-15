@@ -36,6 +36,14 @@ function ExamTimeTable() {
     status: 'Scheduled',
   });
 
+  // Upload Results Modal States
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadingExamId, setUploadingExamId] = useState(null);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState('');
+  const [uploadMessageType, setUploadMessageType] = useState('');
+
   const API_BASE_URL = 'http://localhost:4000/api';
   const token = localStorage.getItem('token');
 
@@ -183,6 +191,93 @@ function ExamTimeTable() {
       setMessage('');
       setMessageType('');
     }, 3000);
+  };
+
+  // Upload Results Handlers
+  const openUploadModal = (examId) => {
+    setUploadingExamId(examId);
+    setUploadFile(null);
+    setUploadMessage('');
+    setShowUploadModal(true);
+  };
+
+  const closeUploadModal = () => {
+    setShowUploadModal(false);
+    setUploadingExamId(null);
+    setUploadFile(null);
+    setUploadMessage('');
+    setUploadMessageType('');
+  };
+
+  const handleUploadFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const validTypes = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel',
+        'text/csv',
+      ];
+
+      if (validTypes.includes(file.type) || file.name.endsWith('.csv') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        setUploadFile(file);
+        setUploadMessage('');
+      } else {
+        setUploadMessage('❌ Please upload a valid Excel or CSV file');
+        setUploadMessageType('error');
+      }
+    }
+  };
+
+  const handleUploadSubmit = async () => {
+    if (!uploadFile) {
+      setUploadMessage('❌ Please select a file to upload');
+      setUploadMessageType('error');
+      return;
+    }
+
+    setUploadLoading(true);
+    setUploadMessage('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', uploadFile);
+
+      const response = await fetch(
+        `${API_BASE_URL}/exams/${uploadingExamId}/upload-results`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const successMsg = `✅ ${data.message}`;
+        setUploadMessage(successMsg);
+        setUploadMessageType('success');
+        showNotification(successMsg, 'success');
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          closeUploadModal();
+        }, 2000);
+      } else {
+        const error = await response.json();
+        const errorMsg = `❌ ${error.message || 'Upload failed'}`;
+        setUploadMessage(errorMsg);
+        setUploadMessageType('error');
+      }
+    } catch (error) {
+      console.error('Error uploading results:', error);
+      const errorMsg = `❌ ${error.message || 'Error uploading file'}`;
+      setUploadMessage(errorMsg);
+      setUploadMessageType('error');
+    } finally {
+      setUploadLoading(false);
+    }
   };
 
   const loadSampleData = async () => {
@@ -806,6 +901,13 @@ function ExamTimeTable() {
                     <td><span className={`status-badge status-${exam.status}`}>{exam.status}</span></td>
                     <td className="action-buttons">
                       <button
+                        className="btn-upload"
+                        onClick={() => openUploadModal(exam._id)}
+                        title="Upload Results"
+                      >
+                        📊
+                      </button>
+                      <button
                         className="btn-edit"
                         onClick={() => handleEdit(exam)}
                         title="Edit"
@@ -863,6 +965,66 @@ function ExamTimeTable() {
             {showForm ? 'View Schedule' : '+ Add Exam to Timetable'}
           </button>
         </div>
+
+        {/* Upload Results Modal */}
+        {showUploadModal && (
+          <div className="modal-overlay" onClick={closeUploadModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>📊 Upload Exam Results</h3>
+                <button className="modal-close-btn" onClick={closeUploadModal}>✕</button>
+              </div>
+
+              <div className="modal-body">
+                {uploadMessage && (
+                  <div className={`upload-message ${uploadMessageType}`}>
+                    {uploadMessage}
+                  </div>
+                )}
+
+                <div className="upload-instructions">
+                  <p><strong>📋 Required File Format:</strong></p>
+                  <ul>
+                    <li>File Type: Excel (.xlsx, .xls) or CSV</li>
+                    <li>Columns: Student Email, Student Name, Marks Obtained, Remarks (optional)</li>
+                    <li>Student Email and Marks are required</li>
+                  </ul>
+                </div>
+
+                <div className="file-upload-area">
+                  <label htmlFor="upload-file" className="file-label">
+                    {uploadFile ? `✅ ${uploadFile.name}` : '📁 Click to select file or drag & drop'}
+                  </label>
+                  <input
+                    id="upload-file"
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleUploadFileChange}
+                    className="file-input"
+                    disabled={uploadLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  className="btn-cancel-modal"
+                  onClick={closeUploadModal}
+                  disabled={uploadLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn-upload-results"
+                  onClick={handleUploadSubmit}
+                  disabled={uploadLoading || !uploadFile}
+                >
+                  {uploadLoading ? '⏳ Uploading...' : '📤 Upload Results'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </PageLayout>
   );

@@ -14,30 +14,34 @@ const resultSchema = new mongoose.Schema(
     },
     studentEmail: {
       type: String,
-      required: true,
+      default: '',
     },
     studentName: {
       type: String,
-      required: true,
+      default: '',
     },
     indexNo: {
       type: String,
     },
+    subjectCode: {
+      type: String,
+      // For bulk uploads with subject codes
+    },
     marksObtained: {
       type: Number,
-      required: true,
+      default: 0,
     },
     totalMarks: {
       type: Number,
-      required: true,
+      default: 0,
     },
     percentage: {
       type: Number,
-      required: true,
+      default: 0,
     },
     grade: {
       type: String,
-      enum: ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F'],
+      enum: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'AB', 'W'],
     },
     remarks: {
       type: String,

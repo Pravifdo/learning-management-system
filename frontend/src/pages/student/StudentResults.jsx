@@ -110,6 +110,12 @@ function StudentResults() {
                     <span>📚 Subject:</span>
                     <strong>{result.examId?.subject || 'N/A'}</strong>
                   </div>
+                  {result.indexNo && (
+                    <div className="footer-item">
+                      <span>🎓 Index No:</span>
+                      <strong>{result.indexNo}</strong>
+                    </div>
+                  )}
                 </div>
                 {result.remarks && (
                   <div className="result-remarks">
