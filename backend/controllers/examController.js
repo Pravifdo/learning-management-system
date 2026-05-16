@@ -488,3 +488,100 @@ export const getMyResults = async (req, res) => {
     });
   }
 };
+// Add a single student result (manual entry)
+export const addSingleResult = async (req, res) => {
+  try {
+    const { examId } = req.params;
+    const { indexNo, studentEmail, studentName, marksObtained, grade, remarks } = req.body;
+
+    if (!examId || !indexNo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Exam ID and Index Number are required',
+      });
+    }
+
+    // Check if exam exists
+    const exam = await Exam.findById(examId);
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: 'Exam not found',
+      });
+    }
+
+    const totalMarks = exam.totalMarks || 100;
+    const marks = Number(marksObtained) || 0;
+    const percentage = (marks / totalMarks) * 100;
+
+    const resultData = {
+      examId,
+      indexNo: indexNo.toString().trim(),
+      studentEmail: studentEmail ? studentEmail.toLowerCase().trim() : '',
+      studentName: studentName || '',
+      marksObtained: marks,
+      totalMarks,
+      percentage,
+      grade: grade || '',
+      remarks: remarks || '',
+      year: exam.year,
+      semester: exam.semester,
+      uploadedAt: new Date(),
+    };
+
+    // Check if result already exists for this student and exam
+    const existingResult = await Result.findOne({
+      examId,
+      indexNo: indexNo.toString().trim(),
+    });
+
+    let result;
+    if (existingResult) {
+      // Update existing result
+      result = await Result.findByIdAndUpdate(existingResult._id, resultData, {
+        new: true,
+      });
+    } else {
+      // Create new result
+      result = new Result(resultData);
+      await result.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: existingResult ? 'Result updated successfully' : 'Result added successfully',
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Delete a specific result (admin only)
+export const deleteResult = async (req, res) => {
+  try {
+    const { resultId } = req.params;
+
+    const result = await Result.findByIdAndDelete(resultId);
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'Result not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Result deleted successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

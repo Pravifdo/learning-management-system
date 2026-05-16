@@ -12,6 +12,8 @@ import {
   getAllResults,
   downloadAllResults,
   getMyResults,
+  addSingleResult,
+  deleteResult,
 } from '../controllers/examController.js';
 import { protect, isAdmin } from '../middleware/authMiddleware.js';
 
@@ -38,5 +40,7 @@ router.get('/:id', protect, getExamById); // MUST come after specific routes lik
 // Exam-specific routes
 router.post('/:examId/upload-results', protect, isAdmin, upload.single('file'), uploadExamResults); // Upload results from Excel
 router.get('/:examId/results', protect, isAdmin, getExamResults); // Get results for an exam
+router.post('/:examId/results', protect, isAdmin, addSingleResult); // Add/Update a single result
+router.delete('/results/:resultId', protect, isAdmin, deleteResult); // Delete a result
 
 export default router;

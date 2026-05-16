@@ -1217,6 +1217,28 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.btn-view-results {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  margin-right: 5px;
+}
+
+.btn-view-results:hover {
+  background-color: #2563eb;
+  transform: scale(1.1);
+}
+
+.btn-view-results:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 

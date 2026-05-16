@@ -15,8 +15,10 @@ import LecturerUploads from './pages/lecturer/LecturerUploads';
 import CourseUploads from './pages/student/CourseUploads';
 import MyCourses from './pages/student/myCouses';
 import ExamTimeTable from './pages/admin/ExamTimeTable.jsx';
+import ExamResultsView from './pages/admin/ExamResultsView.jsx';
 import ManageCourses from './pages/admin/ManageCourses.jsx';
 import SystemReports from './pages/admin/SystemReports.jsx';
+import EnterResults from './pages/admin/EnterResults.jsx';
 import Settings from './pages/admin/Settings.jsx';
 import './App.css';
 
@@ -117,6 +119,14 @@ function AppRoutes() {
       <Route
         path="/admin/timetable"
         element={<RoleRoute element={<ExamTimeTable />} allowedRole="admin" />}
+      />
+      <Route
+        path="/admin/exam/:examId/results"
+        element={<RoleRoute element={<ExamResultsView />} allowedRole="admin" />}
+      />
+      <Route
+        path="/admin/exam/:examId/enter-results"
+        element={<RoleRoute element={<EnterResults />} allowedRole="admin" />}
       />
       <Route
         path="/admin/courses"
