@@ -1,5 +1,6 @@
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import NotificationBell from './NotificationBell';
 import '../styles/PageStyles.css';
 
 function PageLayout({ title, subtitle, children, showUserInfo = false, userDetails = null }) {
@@ -19,6 +20,7 @@ function PageLayout({ title, subtitle, children, showUserInfo = false, userDetai
           <h1>{title}</h1>
         </div>
         <div className="navbar-right">
+          <NotificationBell />
           <span className="user-name">{user?.fullName}</span>
           <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>

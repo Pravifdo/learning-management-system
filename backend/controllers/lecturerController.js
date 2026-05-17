@@ -2,6 +2,7 @@ import Lecturer from "../models/Lecturer.js";
 import Student from "../models/Student.js";
 import User from "../models/User.js";
 import Upload from "../models/Upload.js";
+import { createAssignmentNotification } from "./notificationController.js";
 
 // Create lecturer profile
 export const createLecturerProfile = async (req, res) => {
@@ -248,6 +249,11 @@ export const uploadContent = async (req, res) => {
 
     await upload.save();
 
+    // Create notification if it's an assignment
+    if (type === "assignment") {
+      await createAssignmentNotification(upload);
+    }
+
     res.status(201).json({
       message: `${type === "notes" ? "Lecture notes" : "Assignment"} uploaded successfully`,
       upload,
@@ -305,6 +311,11 @@ export const adminUploadContent = async (req, res) => {
     });
 
     await upload.save();
+
+    // Create notification if it's an assignment
+    if (type === "assignment") {
+      await createAssignmentNotification(upload);
+    }
 
     res.status(201).json({
       message: `${type === "notes" ? "Lecture notes" : "Assignment"} uploaded successfully`,
