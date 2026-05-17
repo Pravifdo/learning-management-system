@@ -14,12 +14,14 @@ import LecturerUpload from './pages/lecturer/LecturerUpload';
 import LecturerUploads from './pages/lecturer/LecturerUploads';
 import CourseUploads from './pages/student/CourseUploads';
 import MyCourses from './pages/student/myCouses';
+import LecturerProfilePage from './pages/student/LecturerProfilePage';
 import ExamTimeTable from './pages/admin/ExamTimeTable.jsx';
 import ExamResultsView from './pages/admin/ExamResultsView.jsx';
 import ManageCourses from './pages/admin/ManageCourses.jsx';
 import SystemReports from './pages/admin/SystemReports.jsx';
 import EnterResults from './pages/admin/EnterResults.jsx';
 import Settings from './pages/admin/Settings.jsx';
+import AdminUpload from './pages/admin/AdminUpload.jsx';
 import './App.css';
 
 // Protected Route Component
@@ -105,6 +107,10 @@ function AppRoutes() {
         element={<RoleRoute element={<MyCourses />} allowedRole="student" />}
       />
       <Route
+        path="/lecturer/:lecturerId"
+        element={<RoleRoute element={<LecturerProfilePage />} allowedRole="student" />}
+      />
+      <Route
         path="/student/courses/:subject/uploads"
         element={<RoleRoute element={<CourseUploads />} allowedRole="student" />}
       />
@@ -139,6 +145,10 @@ function AppRoutes() {
       <Route
         path="/admin/settings"
         element={<RoleRoute element={<Settings />} allowedRole="admin" />}
+      />
+      <Route
+        path="/admin/uploads"
+        element={<RoleRoute element={<AdminUpload />} allowedRole="admin" />}
       />
       <Route
         path="/student/exams"

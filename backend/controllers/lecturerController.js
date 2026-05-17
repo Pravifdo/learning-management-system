@@ -261,6 +261,64 @@ export const uploadContent = async (req, res) => {
   }
 };
 
+// Admin upload content (upload as if from a lecturer)
+export const adminUploadContent = async (req, res) => {
+  try {
+    const { subject, topic, startDate, endDate, lecturerId } = req.body;
+
+    // Validate required fields
+    if (!subject || !topic || !lecturerId) {
+      return res.status(400).json({
+        message: "Please provide subject, topic, and lecturer ID",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please upload a file",
+      });
+    }
+
+    // Determine type from request path
+    const type = req.path.includes('/notes') ? 'notes' : 'assignment';
+
+    // Verify lecturer exists
+    const lecturer = await Lecturer.findById(lecturerId);
+    if (!lecturer) {
+      return res.status(404).json({
+        message: "Lecturer not found",
+      });
+    }
+
+    // Create upload record with admin-specified lecturer
+    const upload = new Upload({
+      lecturerId: lecturer._id,
+      userId: lecturer.userId,
+      type,
+      subject,
+      topic,
+      fileName: req.file.originalname,
+      fileUrl: `/uploads/${req.file.filename}`,
+      fileSize: req.file.size,
+      startDate: type === "assignment" ? startDate : undefined,
+      endDate: type === "assignment" ? endDate : undefined,
+    });
+
+    await upload.save();
+
+    res.status(201).json({
+      message: `${type === "notes" ? "Lecture notes" : "Assignment"} uploaded successfully`,
+      upload,
+    });
+  } catch (error) {
+    console.error("Admin upload error:", error);
+    res.status(500).json({
+      message: "Error uploading content",
+      error: error.message,
+    });
+  }
+};
+
 // Get all uploads for a lecturer
 export const getUploads = async (req, res) => {
   try {
@@ -460,6 +518,85 @@ export const getAllLecturers = async (req, res) => {
     console.error("Get all lecturers error:", error);
     res.status(500).json({
       message: "Error fetching all lecturers",
+      error: error.message,
+    });
+  }
+};
+
+// Get uploads for a specific lecturer (public endpoint for students)
+export const getLecturerUploads = async (req, res) => {
+  try {
+    const { lecturerId } = req.params;
+
+    // Get the lecturer object ID
+    const lecturer = await Lecturer.findById(lecturerId);
+    if (!lecturer) {
+      return res.status(404).json({
+        message: "Lecturer not found",
+      });
+    }
+
+    // Get all uploads for this lecturer
+    const uploads = await Upload.find({ lecturerId })
+      .sort({ uploadedAt: -1 })
+      .lean();
+
+    res.status(200).json({
+      message: "Lecturer uploads retrieved successfully",
+      uploads,
+    });
+  } catch (error) {
+    console.error("Get lecturer uploads error:", error);
+    res.status(500).json({
+      message: "Error fetching lecturer uploads",
+      error: error.message,
+    });
+  }
+};
+
+// Get lecturer profile with courses and uploads
+export const getLecturerProfilePublic = async (req, res) => {
+  try {
+    const { lecturerId } = req.params;
+
+    const lecturer = await Lecturer.findById(lecturerId)
+      .populate("userId", "fullName email phoneNumber");
+
+    if (!lecturer) {
+      return res.status(404).json({
+        message: "Lecturer not found",
+      });
+    }
+
+    // Get uploads for this lecturer
+    const uploads = await Upload.find({ lecturerId })
+      .sort({ uploadedAt: -1 })
+      .lean();
+
+    // Get courses for this lecturer
+    const courses = lecturer.courses || [];
+
+    res.status(200).json({
+      message: "Lecturer profile retrieved successfully",
+      lecturer: {
+        id: lecturer._id,
+        userId: lecturer.userId?._id,
+        fullName: lecturer.userId?.fullName,
+        email: lecturer.userId?.email,
+        phoneNumber: lecturer.userId?.phoneNumber,
+        subject: lecturer.subject,
+        department: lecturer.department,
+        officeLocation: lecturer.officeLocation,
+        officeHours: lecturer.officeHours,
+        bio: lecturer.bio,
+        courses,
+      },
+      uploads,
+    });
+  } catch (error) {
+    console.error("Get lecturer profile error:", error);
+    res.status(500).json({
+      message: "Error fetching lecturer profile",
       error: error.message,
     });
   }

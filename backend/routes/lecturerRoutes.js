@@ -14,6 +14,9 @@ import {
   getLecturerCoursesProfile,
   deleteCourse,
   getAllLecturers,
+  getLecturerUploads,
+  getLecturerProfilePublic,
+  adminUploadContent,
 } from "../controllers/lecturerController.js";
 import { protect, isLecturer } from "../middleware/authMiddleware.js";
 
@@ -34,6 +37,12 @@ const router = express.Router();
 
 // Get all lecturers (public route)
 router.get("/all", getAllLecturers);
+
+// Get specific lecturer profile with uploads (public route)
+router.get("/:lecturerId", getLecturerProfilePublic);
+
+// Get uploads for specific lecturer (public route)
+router.get("/:lecturerId/uploads", getLecturerUploads);
 
 // Lecturer profile routes
 router.post("/profile", protect, isLecturer, createLecturerProfile);

@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import lecturerRoutes from "./routes/lecturerRoutes.js";
 import examRoutes from "./routes/examRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -35,6 +36,7 @@ app.use("/api", authRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/lecturer", lecturerRoutes);
 app.use("/api/exams", examRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Test route
 app.get("/", (req, res) => {
